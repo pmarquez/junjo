@@ -1,0 +1,66 @@
+openapi: 3.0.0
+info:
+  title: junjoAPI
+  version: '1.0'
+  contact:
+    name: Paulo Márquez Herrero
+    url: pmarquezh.info
+    email: me@pmarquezh.info
+  license:
+    name: Apache 2.0
+    url: 'https://www.apache.org/licenses/LICENSE-2.0'
+servers:
+  - url: 'http://localhost:8100'
+    description: Local
+paths:
+  /junjoAPI/1.0/sequences/:
+    post:
+      summary: ''
+      operationId: post-sequences
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Bad Request
+      description: Creates a new sequence in storage.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SequenceStateRec'
+        description: SequenceStateRec with the initial data.
+    parameters: []
+components:
+  schemas:
+    SequenceStateRec:
+      title: SequenceStateRec
+      type: object
+      description: Keeps the stored state of a sequence.
+      x-examples:
+        Sequence already in use:
+          id: 78ebab54-884d-11ec-a8a3-0242ac120002
+          sequenceName: SKUs
+          format: '{AA}-{NNNN}'
+          currentNumericSequence: 149
+          currentAlphaSequence: AD
+          priorityType: numeric
+        New Sequence:
+          id: 78ebab54-884d-11ec-a8a3-0242ac120002
+          sequenceName: SKUs
+          format: '{AA}-{NNNN}'
+          currentNumericSequence: 0
+          currentAlphaSequence: AA
+          priorityType: numeric
+      properties:
+        id:
+          type: string
+        sequenceName:
+          type: string
+        format:
+          type: string
+        currentNumericSequence:
+          type: integer
+        currentAlphaSequence:
+          type: string
+        priotityType:
+          type: string
