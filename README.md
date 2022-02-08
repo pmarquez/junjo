@@ -11,7 +11,7 @@ junjo: "sequence" in Japanese, is a microservice that returns the next code in, 
 [GitHub Isue Tracker](https://github.com/pmarquez/junjo/issues)
 
 ## Junjo OpenAPI Doc
-[OpenAPI Doc] To Be Released.
+[OpenAPI Doc] (https://github.com/pmarquez/junjo/blob/main/junjoAPI.yaml)
 
 ## Release Notes
 ### v0.0.1
