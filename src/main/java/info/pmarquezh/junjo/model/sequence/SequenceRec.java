@@ -45,7 +45,8 @@ public class SequenceRec {
     String id;
     String sequenceName;
     String format;
-    int currentNumericSequence;
-    String currentAlphaSequence;
+    int    currentNumericSequence;
+    int    currentAlphaSequence;
+    String currentAlphaRepresentation;
     String priorityType;
 }

@@ -43,6 +43,11 @@ import info.pmarquezh.junjo.repository.SequenceRepository;
 @Service
 public class SequenceServiceImpl implements SequenceService {
 
+    @Value("${info.pmarquezh.junjo.numericPattern}")
+    private String      numericPatternString;
+    @Value("${info.pmarquezh.junjo.alphaPattern}")
+    private String      alphaPatternString;
+
     private SequenceRepository sequenceRepository;
 
     @Autowired
@@ -80,9 +85,9 @@ public class SequenceServiceImpl implements SequenceService {
     @Override
     public SequenceRec retrieveSequence ( String sequenceId ) {
 
-//        for ( SequenceRec seq : sequenceRepository.findAll ( ) ) {
-//            System.out.println ( seq.getId ( ) + " - " + seq.getSequenceName ( ) );
-//        }
+        for ( SequenceRec seq : sequenceRepository.findAll ( ) ) {
+            System.out.println ( seq.getId ( ) + " - " + seq.getSequenceName ( ) );
+        }
 
         if ( sequenceRepository.existsById ( sequenceId ) ) {
             Optional<SequenceRec> sequenceWrapper = sequenceRepository.findById ( sequenceId );
@@ -149,14 +154,6 @@ public class SequenceServiceImpl implements SequenceService {
 
     }
 
-//   WIP
-
-
-    @Value("${info.pmarquezh.junjo.numericPattern}")
-    private String      numericPatternString;
-    @Value("${info.pmarquezh.junjo.alphaPattern}")
-    private String      alphaPatternString;
-
     /**
      * Generates the next element in the sequence.
      *
@@ -168,7 +165,7 @@ public class SequenceServiceImpl implements SequenceService {
 
         SequenceRec sequence = this.retrieveSequence ( sequenceId );
 
-        String s = sequence.getFormat ( );
+        String seqElementFormat = sequence.getFormat ( );
 
 //
         for ( SequenceRec seq : sequenceRepository.findAll ( ) ) {
@@ -176,27 +173,32 @@ public class SequenceServiceImpl implements SequenceService {
         }
 //
 
+//   NUMERIC PATTERN
         Pattern numericPattern = Pattern.compile ( numericPatternString );
-        Pattern alphaPattern   = Pattern.compile ( alphaPatternString );
-
-        Matcher numericMatcher = numericPattern.matcher ( s );
-        Matcher alphaMatcher   = alphaPattern.matcher ( s );
+        Matcher numericMatcher = numericPattern.matcher ( seqElementFormat );
 
         while ( numericMatcher.find ( ) ) {
             String numericGroup = numericMatcher.group ( );
-            System.out.println ( "NUMERIC GROUP: " + numericGroup );
-            s = s.replace ( numericGroup, this.processNumericGroup ( sequence, numericGroup ) );
+            seqElementFormat = seqElementFormat.replace ( numericGroup, this.processNumericGroup ( sequence, numericGroup ) );
         }
+
+//   ALPHA PATTERN
+        Pattern alphaPattern   = Pattern.compile ( alphaPatternString );
+        Matcher alphaMatcher   = alphaPattern.matcher ( seqElementFormat );
 
         while ( alphaMatcher.find ( ) ) {
             String alphaGroup = alphaMatcher.group ( );
             System.out.println ( "ALPHA GROUP: " + alphaGroup );
-            //            this.processAlphaGroup ( sequence, alphaGroup )
+            System.out.println ( "seqElementFormat: " + seqElementFormat );
+            seqElementFormat = seqElementFormat.replace ( alphaGroup, this.processAlphaGroup ( sequence, alphaGroup ) );
+
+            System.out.println ( "sequence: " + sequence );
+
         }
 
         sequenceRepository.save ( sequence );
 
-        return s;
+        return seqElementFormat;
     }
 
     /**
@@ -223,6 +225,34 @@ public class SequenceServiceImpl implements SequenceService {
         return nextNumberStr;
 
     }
+
+    /**
+     *
+     * @param sequence
+     * @param alphaGroup
+     * @return
+     */
+    private String processAlphaGroup ( SequenceRec sequence, String alphaGroup ) {
+
+        String nextAlphaStr = "";
+
+        int currentAlphaSequence = sequence.getCurrentAlphaSequence ( ) + 1;
+
+        sequence.setCurrentAlphaSequence ( currentAlphaSequence );
+
+        return transformSequenceToRepresentation ( currentAlphaSequence );
+    }
+
+    /**
+     *
+     * @param alphaSequence
+     * @return
+     */
+    private String transformSequenceToRepresentation ( int alphaSequence ) {
+        return alphaSequence < 0 ? "" : str((alphaSequence / 26) - 1) + (char)(65 + alphaSequence % 26);
+
+    }
+
 
     /**
      *
@@ -260,8 +290,6 @@ public class SequenceServiceImpl implements SequenceService {
      */
     void generateSkus ( int solicitud ) {
 
-        System.out.println ( "QUIERO GENERAR: " + solicitud + " SKUs." );
-
         boolean done = false;
         int count = 0;
 
@@ -282,6 +310,5 @@ public class SequenceServiceImpl implements SequenceService {
         }
 
     }
-//   WIP
 
 }
