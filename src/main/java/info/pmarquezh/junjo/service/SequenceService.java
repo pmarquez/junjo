@@ -40,4 +40,11 @@ public interface SequenceService {
      * @return
      */
     String persistSequence(SequenceRec sequence);
+
+    /**
+     * Retrieves a sequence [R]
+     * @param sequenceId
+     * @return SequenceRec The requested sequence record or null if not found.
+     */
+    SequenceRec retrieveSequence(String sequenceId);
 }

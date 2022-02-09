@@ -59,21 +59,39 @@ public class SequenceRestController {
      * Persists a new Sequence [C].
      * @return
      */
-    @PostMapping( { "/" } )
-    public ResponseEntity<Void> persistDocument (@RequestBody SequenceRec sequence ) {
+    @PostMapping( { "" } )
+    public ResponseEntity<Void> persistSequence (@RequestBody SequenceRec sequence ) {
 
 //TODO ADD THE STATUSES WHERE CREATION WAS NOT POSSIBLE (Failed Validations, DB Errors, etc.)
 
-        String newSequenceId = sequenceService.persistSequence ( sequence );
+        String newSequenceId = sequenceService.persistSequence(sequence);
 
-        if ( !newSequenceId.equals ( "" )  ) {
+        if (!newSequenceId.equals("")) {
             HttpHeaders headers = new HttpHeaders();
-                        headers.add("Location", newSequenceId );
+            headers.add("Location", newSequenceId);
 
-            return new ResponseEntity ( headers, HttpStatus.CREATED );
+            return new ResponseEntity(headers, HttpStatus.CREATED);
 
         } else {
-            return new ResponseEntity ( HttpStatus.BAD_REQUEST ); //   CORRECT RESPONSE STATUS?
+            return new ResponseEntity(HttpStatus.BAD_REQUEST); //   CORRECT RESPONSE STATUS?
+
+        }
+    }
+
+    /**
+     * Retrieves a new Sequence [R].
+     * @return
+     */
+    @GetMapping( { "/{seqId}" } )
+    public ResponseEntity<SequenceRec> retrieveDocument ( @PathVariable ( "seqId" ) String seqId ) {
+
+        SequenceRec sequence = sequenceService.retrieveSequence ( seqId );
+
+        if ( sequence != null  ) {
+            return new ResponseEntity ( sequence, HttpStatus.OK );
+
+        } else {
+            return new ResponseEntity ( HttpStatus.NOT_FOUND ); //   CORRECT RESPONSE STATUS?
 
         }
 

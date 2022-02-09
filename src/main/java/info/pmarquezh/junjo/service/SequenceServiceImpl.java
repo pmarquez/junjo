@@ -13,6 +13,7 @@ import info.pmarquezh.junjo.model.sequence.SequenceRec;
 import info.pmarquezh.junjo.repository.SequenceRepository;
 
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -65,11 +66,31 @@ public class SequenceServiceImpl implements SequenceService {
 
         sequenceRepository.save ( newSequence );
 
-        for ( SequenceRec seq : sequenceRepository.findAll ( ) ) {
-            System.out.println ( seq.getId ( ) );
-        }
+//        for ( SequenceRec seq : sequenceRepository.findAll ( ) ) {
+//            System.out.println ( seq.getId ( ) + " - " + seq.getSequenceName ( ) );
+//        }
 
         return newSequence.getId ( );
+
+    }
+
+    /**
+     * Retrieves a sequence by ID
+     * @param sequenceId
+     * @return
+     */
+    @Override
+    public SequenceRec retrieveSequence ( String sequenceId ) {
+
+        if ( sequenceRepository.existsById ( sequenceId ) ) {
+            Optional<SequenceRec> sequenceWrapper = sequenceRepository.findById ( sequenceId );
+
+            return sequenceWrapper.get ( );
+
+        } else {
+            return null;
+
+        }
 
     }
 
