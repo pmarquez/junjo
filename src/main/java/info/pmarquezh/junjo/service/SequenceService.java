@@ -62,4 +62,11 @@ public interface SequenceService {
      */
     String deleteSequence ( String sequenceId );
 
+    /**
+     * Generates the next element in the sequence [D]
+     * @param sequenceId
+     * @return String The generated element from a sequence or null (if sequenceId is not valid/found).
+     */
+    String getNextInSequence ( String sequenceId );
+
 }

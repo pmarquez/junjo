@@ -141,4 +141,24 @@ public class SequenceRestController {
 
     }
 
+    /**
+     * Generate next element in the sequence.
+     * @return
+     */
+    @GetMapping( { "generate/{sequenceId}" } )
+    public ResponseEntity<String> generateNextElementInSequence ( @PathVariable ( "sequenceId" ) String sequenceId ) {
+
+        String generatedElement = sequenceService.getNextInSequence ( sequenceId );
+
+        if ( generatedElement != null  ) {
+
+            return new ResponseEntity ( generatedElement, HttpStatus.OK );
+
+        } else {
+            return new ResponseEntity ( HttpStatus.NOT_FOUND ); //   CORRECT RESPONSE STATUS?
+
+        }
+
+    }
+
 }

@@ -1,6 +1,10 @@
 package info.pmarquezh.junjo.service;
 
 //   Standard Libraries Imports
+import java.util.Optional;
+import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 //   Third Party Libraries Imports
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,9 +16,6 @@ import org.springframework.stereotype.Service;
 import info.pmarquezh.junjo.model.sequence.SequenceRec;
 import info.pmarquezh.junjo.repository.SequenceRepository;
 
-import java.util.ArrayList;
-import java.util.Optional;
-import java.util.UUID;
 
 /**
  * SequenceServiceImpl.java<br><br>
@@ -150,5 +151,93 @@ public class SequenceServiceImpl implements SequenceService {
         }
 
     }
+
+//   WIP
+
+    /**
+     * Generates the next element in the sequence.
+     *
+     * @param sequenceId
+     * @return String The generated element from a sequence or null (if sequenceId is not valid/found).
+     */
+    @Override
+    public String getNextInSequence ( String sequenceId ) {
+
+        SequenceRec sequence = this.retrieveSequence ( sequenceId );
+
+        String s = sequence.getFormat ( );
+
+        for ( SequenceRec seq : sequenceRepository.findAll ( ) ) {
+            System.out.println ( seq.getId ( ) + " - " + seq.getSequenceName ( ) );
+        }
+
+        Pattern numericPattern = Pattern.compile ( "\\{[N]+\\}" );
+        Pattern alphaPattern   = Pattern.compile ( "\\{[A]+\\}" );
+
+        Matcher numericMatcher = numericPattern.matcher ( s );
+        Matcher alphaMatcher   = alphaPattern.matcher ( s );
+
+        while ( numericMatcher.find ( ) ) {
+            String numericGroup = numericMatcher.group ( );
+            System.out.println ( "NUMERIC GROUP: " + numericGroup );
+        }
+
+        while ( alphaMatcher.find ( ) ) {
+            String alphaGroup = alphaMatcher.group ( );
+            System.out.println ( "ALPHA GROUP: " + alphaGroup );
+        }
+
+        return s;
+    }
+
+
+    int startStringIdx = 18278;
+    //int endStringIdx   = 18288;
+    int endStringIdx   = 475253;
+
+    int startingNum  = 1000;
+    int endingNum    = 9999;
+
+    int currentNum = startingNum;
+
+    /**
+     *
+     * @param i
+     * @return
+     */
+    String str (int i) {
+
+        return i < 0 ? "" : str((i / 26) - 1) + (char)(65 + i % 26);
+    }
+
+    /**
+     *
+     * @param solicitud
+     */
+    void generateSkus ( int solicitud ) {
+
+        System.out.println ( "QUIERO GENERAR: " + solicitud + " SKUs." );
+
+        boolean done = false;
+        int count = 0;
+
+        for (int i = startStringIdx; i <= endStringIdx; i++) {
+            if ( done ) break;
+
+            String out = str ( i );
+
+            for (int j = currentNum; j <= endingNum; j++) {
+                count++;
+//                System.out.println ( "     count: " + count + " => " + out + "-" + j );
+                System.out.println ( out + "-" + j );
+                if ( count >= solicitud ) {
+                    done = true;
+                    break;
+                }
+            }
+        }
+
+    }
+//   WIP
 
 }
