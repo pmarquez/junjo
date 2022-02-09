@@ -82,6 +82,10 @@ public class SequenceServiceImpl implements SequenceService {
     @Override
     public SequenceRec retrieveSequence ( String sequenceId ) {
 
+        for ( SequenceRec seq : sequenceRepository.findAll ( ) ) {
+            System.out.println ( seq.getId ( ) + " - " + seq.getSequenceName ( ) );
+        }
+
         if ( sequenceRepository.existsById ( sequenceId ) ) {
             Optional<SequenceRec> sequenceWrapper = sequenceRepository.findById ( sequenceId );
 
@@ -92,6 +96,27 @@ public class SequenceServiceImpl implements SequenceService {
 
         }
 
+    }
+
+    /**
+     * Deletes a sequence [R]
+     *
+     * @param sequenceId
+     * @return SequenceRec The sequence record to delete or null if not found (null is only informative).
+     */
+    @Override
+    public String deleteSequence(String sequenceId) {
+
+        if ( sequenceRepository.existsById ( sequenceId ) ) {
+            Optional<SequenceRec> sequenceWrapper = sequenceRepository.findById ( sequenceId );
+                                                    sequenceRepository.delete ( sequenceWrapper.get ( ) );
+
+            return sequenceWrapper.get ( ).getId ( );
+
+        } else {
+            return null;
+
+        }
     }
 
 }

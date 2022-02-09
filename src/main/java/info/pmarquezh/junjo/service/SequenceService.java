@@ -47,4 +47,11 @@ public interface SequenceService {
      * @return SequenceRec The requested sequence record or null if not found.
      */
     SequenceRec retrieveSequence(String sequenceId);
+
+    /**
+     * Deletes a sequence [R]
+     * @param sequenceId
+     * @return SequenceRec The sequence record to delete or null if not found (null is only informative).
+     */
+    String deleteSequence ( String sequenceId );
 }

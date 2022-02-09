@@ -37,9 +37,9 @@ paths:
         name: sequenceId
         in: path
         required: true
-        description: Id of the secuence to retrieve
+        description: Id of the sequence to delete
     get:
-      summary: ''
+      summary: sequences
       operationId: get-1.0-sequences
       responses:
         '200':
@@ -51,6 +51,15 @@ paths:
         '404':
           description: Not Found
       description: Retrieves the SequenceRec identified by sequenceId
+    delete:
+      summary: ''
+      operationId: delete-1.0-sequences-sequenceId
+      responses:
+        '204':
+          description: No Content
+        '404':
+          description: Not Found
+      description: Deletes a record identified by sequenceId
 components:
   schemas:
     SequenceRec:

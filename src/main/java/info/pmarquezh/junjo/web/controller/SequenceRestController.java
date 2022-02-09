@@ -82,13 +82,35 @@ public class SequenceRestController {
      * Retrieves a new Sequence [R].
      * @return
      */
-    @GetMapping( { "/{seqId}" } )
-    public ResponseEntity<SequenceRec> retrieveDocument ( @PathVariable ( "seqId" ) String seqId ) {
+    @GetMapping( { "/{sequenceId}" } )
+    public ResponseEntity<SequenceRec> retrieveSequence ( @PathVariable ( "sequenceId" ) String sequenceId ) {
 
-        SequenceRec sequence = sequenceService.retrieveSequence ( seqId );
+        SequenceRec sequence = sequenceService.retrieveSequence ( sequenceId );
 
         if ( sequence != null  ) {
             return new ResponseEntity ( sequence, HttpStatus.OK );
+
+        } else {
+            return new ResponseEntity ( HttpStatus.NOT_FOUND ); //   CORRECT RESPONSE STATUS?
+
+        }
+
+    }
+
+    /**
+     * Deletes a Sequence [D].
+     * @return
+     */
+    @DeleteMapping( { "/{sequenceId}" } )
+    public ResponseEntity<Void> deleteSequence ( @PathVariable ( "sequenceId" ) String sequenceId ) {
+
+        String deletedSequenceId = sequenceService.deleteSequence ( sequenceId );
+
+        if ( deletedSequenceId != null  ) {
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("X-Deleted", deletedSequenceId);
+
+            return new ResponseEntity ( HttpStatus.NO_CONTENT );
 
         } else {
             return new ResponseEntity ( HttpStatus.NOT_FOUND ); //   CORRECT RESPONSE STATUS?
