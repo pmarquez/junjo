@@ -75,6 +75,28 @@ paths:
             schema:
               $ref: '#/components/schemas/SequenceRec'
         description: Data to update the record identified by the parameter "sequenceId"
+  '/junjoAPI/1.0/sequences/generate/{sequenceId}':
+    parameters:
+      - schema:
+          type: string
+        name: sequenceId
+        in: path
+        required: true
+        description: The ID of the Sequence to use
+    get:
+      summary: Generate Next Element in Sequence
+      tags: []
+      responses:
+        '200':
+          description: Request processed OK
+          content:
+            application/json:
+              schema:
+                type: string
+        '404':
+          description: Not Found
+      operationId: get-1.0-sequences-generate-sequenceId
+      description: Generates and returns a String containing the next element in the sequence represented by sequenceId.
 components:
   schemas:
     SequenceRec:

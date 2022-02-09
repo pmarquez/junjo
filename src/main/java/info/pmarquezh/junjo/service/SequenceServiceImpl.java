@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 
 //   Third Party Libraries Imports
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 //   FENIX Framework Imports
@@ -66,10 +67,6 @@ public class SequenceServiceImpl implements SequenceService {
                                                          .build ( );
 
         sequenceRepository.save ( newSequence );
-
-//        for ( SequenceRec seq : sequenceRepository.findAll ( ) ) {
-//            System.out.println ( seq.getId ( ) + " - " + seq.getSequenceName ( ) );
-//        }
 
         return newSequence.getId ( );
 
@@ -154,6 +151,12 @@ public class SequenceServiceImpl implements SequenceService {
 
 //   WIP
 
+
+    @Value("${info.pmarquezh.junjo.numericPattern}")
+    private String      numericPatternString;
+    @Value("${info.pmarquezh.junjo.alphaPattern}")
+    private String      alphaPatternString;
+
     /**
      * Generates the next element in the sequence.
      *
@@ -167,12 +170,14 @@ public class SequenceServiceImpl implements SequenceService {
 
         String s = sequence.getFormat ( );
 
+//
         for ( SequenceRec seq : sequenceRepository.findAll ( ) ) {
             System.out.println ( seq.getId ( ) + " - " + seq.getSequenceName ( ) );
         }
+//
 
-        Pattern numericPattern = Pattern.compile ( "\\{[N]+\\}" );
-        Pattern alphaPattern   = Pattern.compile ( "\\{[A]+\\}" );
+        Pattern numericPattern = Pattern.compile ( numericPatternString );
+        Pattern alphaPattern   = Pattern.compile ( alphaPatternString );
 
         Matcher numericMatcher = numericPattern.matcher ( s );
         Matcher alphaMatcher   = alphaPattern.matcher ( s );
@@ -180,14 +185,53 @@ public class SequenceServiceImpl implements SequenceService {
         while ( numericMatcher.find ( ) ) {
             String numericGroup = numericMatcher.group ( );
             System.out.println ( "NUMERIC GROUP: " + numericGroup );
+            s = s.replace ( numericGroup, this.processNumericGroup ( sequence, numericGroup ) );
         }
 
         while ( alphaMatcher.find ( ) ) {
             String alphaGroup = alphaMatcher.group ( );
             System.out.println ( "ALPHA GROUP: " + alphaGroup );
+            //            this.processAlphaGroup ( sequence, alphaGroup )
         }
 
+        sequenceRepository.save ( sequence );
+
         return s;
+    }
+
+    /**
+     *
+     * @param sequence
+     * @param numericGroup
+     * @return true if the maximum number has been reached, then sequence re-starts on "1", false if business as usual
+     */
+    private String processNumericGroup ( SequenceRec sequence, String numericGroup ) {
+
+        int maxDigitsAllowed = numericGroup.length ( ) - 2;
+
+        int nextNumber = 1;
+
+        if ( ( 1 + getDigitsCount ( sequence.getCurrentNumericSequence ( ) ) ) <= maxDigitsAllowed ) {
+            nextNumber = 1 + sequence.getCurrentNumericSequence ( );
+        }
+
+        String nextNumberStr = Integer.toString ( nextNumber );
+        while ( nextNumberStr.length ( ) < maxDigitsAllowed ) { nextNumberStr = "0" + nextNumberStr; }
+
+        sequence.setCurrentNumericSequence ( nextNumber );
+
+        return nextNumberStr;
+
+    }
+
+    /**
+     *
+     * @param num
+     * @return
+     */
+    private int getDigitsCount ( int num ) {
+        String numAsString = Integer.toString ( num );
+        return numAsString.length ( );
     }
 
 
