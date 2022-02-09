@@ -3,6 +3,11 @@ package info.pmarquezh.junjo.repository;
 //   Third party Imports
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
+
+//   Domain Imports
+import info.pmarquezh.junjo.model.sequence.SequenceRec;
 
 /**
  * SequenceRepository.java<br><br>
@@ -26,8 +31,5 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
  * @author Paulo Márquez Herrero
  * @version 1.0 - 2022-02-08 17:11
  */
-@Configuration
-@EnableMongoRepositories ( basePackages = "info.pmarquezh.junjo" )
-public class SequenceRepository {
-
-}
+@Repository
+public interface SequenceRepository  extends CrudRepository<SequenceRec, String> { }
