@@ -75,16 +75,16 @@ public class SequenceServiceImpl implements SequenceService {
     }
 
     /**
-     * Retrieves a sequence by ID
+     * Retrieves a sequence by ID [R]
      * @param sequenceId
      * @return
      */
     @Override
     public SequenceRec retrieveSequence ( String sequenceId ) {
 
-        for ( SequenceRec seq : sequenceRepository.findAll ( ) ) {
-            System.out.println ( seq.getId ( ) + " - " + seq.getSequenceName ( ) );
-        }
+//        for ( SequenceRec seq : sequenceRepository.findAll ( ) ) {
+//            System.out.println ( seq.getId ( ) + " - " + seq.getSequenceName ( ) );
+//        }
 
         if ( sequenceRepository.existsById ( sequenceId ) ) {
             Optional<SequenceRec> sequenceWrapper = sequenceRepository.findById ( sequenceId );
@@ -99,24 +99,56 @@ public class SequenceServiceImpl implements SequenceService {
     }
 
     /**
-     * Deletes a sequence [R]
+     * Updates a sequence [U]
      *
      * @param sequenceId
-     * @return SequenceRec The sequence record to delete or null if not found (null is only informative).
+     * @param sequence
+     * @return SequenceRec The sequence record to update.
      */
     @Override
-    public String deleteSequence(String sequenceId) {
+    public String updateSequence(String sequenceId, SequenceRec sequence) {
 
-        if ( sequenceRepository.existsById ( sequenceId ) ) {
-            Optional<SequenceRec> sequenceWrapper = sequenceRepository.findById ( sequenceId );
-                                                    sequenceRepository.delete ( sequenceWrapper.get ( ) );
+        SequenceRec dbSequence = this.retrieveSequence ( sequenceId );
 
-            return sequenceWrapper.get ( ).getId ( );
+        if ( dbSequence != null ) {
+
+            dbSequence.setSequenceName ( sequence.getSequenceName ( ) );
+            dbSequence.setFormat ( sequence.getFormat ( ) );
+            dbSequence.setCurrentAlphaSequence ( sequence.getCurrentAlphaSequence ( ) );
+            dbSequence.setCurrentNumericSequence ( sequence.getCurrentNumericSequence ( ) );
+            dbSequence.setPriorityType ( sequence.getPriorityType ( ) );
+
+            sequenceRepository.save ( dbSequence );
+
+            return dbSequence.getId ( );
 
         } else {
             return null;
 
         }
+    }
+
+    /**
+     * Deletes a sequence [D]
+     *
+     * @param sequenceId
+     * @return SequenceRec The sequence record to delete or null if not found (null is only informative).
+     */
+    @Override
+    public String deleteSequence ( String sequenceId ) {
+
+        SequenceRec dbSequence = this.retrieveSequence ( sequenceId);
+
+        if ( dbSequence != null ) {
+            sequenceRepository.delete ( dbSequence );
+
+            return dbSequence.getId ( );
+
+        } else {
+            return null;
+
+        }
+
     }
 
 }

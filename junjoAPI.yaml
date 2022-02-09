@@ -37,7 +37,7 @@ paths:
         name: sequenceId
         in: path
         required: true
-        description: Id of the sequence to delete
+        description: Id of the sequence to operate on
     get:
       summary: sequences
       operationId: get-1.0-sequences
@@ -60,6 +60,21 @@ paths:
         '404':
           description: Not Found
       description: Deletes a record identified by sequenceId
+    put:
+      summary: ''
+      operationId: put-1.0-sequences-sequenceId
+      responses:
+        '204':
+          description: 'All OK, record updated (or created)'
+        '400':
+          description: 'Bad Request, wrong data supplied.'
+      description: Updates a SequenceRec
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SequenceRec'
+        description: Data to update the record identified by the parameter "sequenceId"
 components:
   schemas:
     SequenceRec:

@@ -60,7 +60,7 @@ public class SequenceRestController {
      * @return
      */
     @PostMapping( { "" } )
-    public ResponseEntity<Void> persistSequence (@RequestBody SequenceRec sequence ) {
+    public ResponseEntity<Void> persistSequence ( @RequestBody SequenceRec sequence ) {
 
 //TODO ADD THE STATUSES WHERE CREATION WAS NOT POSSIBLE (Failed Validations, DB Errors, etc.)
 
@@ -92,6 +92,28 @@ public class SequenceRestController {
 
         } else {
             return new ResponseEntity ( HttpStatus.NOT_FOUND ); //   CORRECT RESPONSE STATUS?
+
+        }
+
+    }
+
+    /**
+     * Updates a Sequence [U].
+     * @return
+     */
+    @PutMapping( { "/{sequenceId}" } )
+    public ResponseEntity<Void> updateSequence ( @PathVariable ( "sequenceId" ) String sequenceId, @RequestBody SequenceRec sequence ) {
+
+        String updatedSequenceId = sequenceService.updateSequence ( sequenceId, sequence );
+
+        if ( updatedSequenceId != null  ) {
+            HttpHeaders headers = new HttpHeaders ( );
+            headers.add("Location", updatedSequenceId );
+
+            return new ResponseEntity ( HttpStatus.NO_CONTENT );
+
+        } else {
+            return new ResponseEntity ( HttpStatus.BAD_REQUEST ); //   CORRECT RESPONSE STATUS?
 
         }
 

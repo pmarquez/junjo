@@ -42,16 +42,24 @@ public interface SequenceService {
     String persistSequence(SequenceRec sequence);
 
     /**
-     * Retrieves a sequence [R]
+     * Retrieves a sequence by Id [R]
      * @param sequenceId
      * @return SequenceRec The requested sequence record or null if not found.
      */
     SequenceRec retrieveSequence(String sequenceId);
 
     /**
-     * Deletes a sequence [R]
+     * Updates a sequence [U]
      * @param sequenceId
-     * @return SequenceRec The sequence record to delete or null if not found (null is only informative).
+     * @return SequenceRec The sequence record to update.
+     */
+    String updateSequence ( String sequenceId, SequenceRec sequence );
+
+    /**
+     * Deletes a sequence [D]
+     * @param sequenceId
+     * @return SequenceRec The sequence record to update or null if not found (null is only informative).
      */
     String deleteSequence ( String sequenceId );
+
 }
