@@ -265,10 +265,8 @@ public class SequenceServiceImpl implements SequenceService {
      * @return
      */
     private String transformSequenceToRepresentation ( int alphaSequence ) {
-        return alphaSequence < 0 ? "" : str((alphaSequence / 26) - 1) + (char)(65 + alphaSequence % 26);
-
+        return alphaSequence < 0 ? "" : transformSequenceToRepresentation (( alphaSequence / 26 ) - 1 ) + ( char ) ( 65 + alphaSequence % 26 );
     }
-
 
     /**
      *
@@ -278,53 +276,6 @@ public class SequenceServiceImpl implements SequenceService {
     private int getDigitsCount ( int num ) {
         String numAsString = Integer.toString ( num );
         return numAsString.length ( );
-    }
-
-
-    int startStringIdx = 18278;
-    //int endStringIdx   = 18288;
-    int endStringIdx   = 475253;
-
-    int startingNum  = 1000;
-    int endingNum    = 9999;
-
-    int currentNum = startingNum;
-
-    /**
-     *
-     * @param i
-     * @return
-     */
-    String str (int i) {
-
-        return i < 0 ? "" : str((i / 26) - 1) + (char)(65 + i % 26);
-    }
-
-    /**
-     *
-     * @param solicitud
-     */
-    void generateSkus ( int solicitud ) {
-
-        boolean done = false;
-        int count = 0;
-
-        for (int i = startStringIdx; i <= endStringIdx; i++) {
-            if ( done ) break;
-
-            String out = str ( i );
-
-            for (int j = currentNum; j <= endingNum; j++) {
-                count++;
-//                System.out.println ( "     count: " + count + " => " + out + "-" + j );
-                System.out.println ( out + "-" + j );
-                if ( count >= solicitud ) {
-                    done = true;
-                    break;
-                }
-            }
-        }
-
     }
 
 }
