@@ -167,33 +167,52 @@ public class SequenceServiceImpl implements SequenceService {
 
         String seqElementFormat = sequence.getFormat ( );
 
-//
-        for ( SequenceRec seq : sequenceRepository.findAll ( ) ) {
-            System.out.println ( seq.getId ( ) + " - " + seq.getSequenceName ( ) );
-        }
-//
+        if ( sequence.getPriorityType ( ).equals ( "numeric" ) ) {
+            //   NUMERIC PATTERN
+            Pattern numericPattern = Pattern.compile ( numericPatternString );
+            Matcher numericMatcher = numericPattern.matcher ( seqElementFormat );
 
-//   NUMERIC PATTERN
-        Pattern numericPattern = Pattern.compile ( numericPatternString );
-        Matcher numericMatcher = numericPattern.matcher ( seqElementFormat );
+            while ( numericMatcher.find ( ) ) {
+                String numericGroup = numericMatcher.group ( );
+                seqElementFormat = seqElementFormat.replace ( numericGroup, this.processNumericGroup ( sequence, numericGroup, true ) );
+            }
 
-        while ( numericMatcher.find ( ) ) {
-            String numericGroup = numericMatcher.group ( );
-            seqElementFormat = seqElementFormat.replace ( numericGroup, this.processNumericGroup ( sequence, numericGroup ) );
-        }
+            //   ALPHA PATTERN
+            Pattern alphaPattern   = Pattern.compile ( alphaPatternString );
+            Matcher alphaMatcher   = alphaPattern.matcher ( seqElementFormat );
 
-//   ALPHA PATTERN
-        Pattern alphaPattern   = Pattern.compile ( alphaPatternString );
-        Matcher alphaMatcher   = alphaPattern.matcher ( seqElementFormat );
+            while ( alphaMatcher.find ( ) ) {
+                String alphaGroup = alphaMatcher.group ( );
 
-        while ( alphaMatcher.find ( ) ) {
-            String alphaGroup = alphaMatcher.group ( );
-            System.out.println ( "ALPHA GROUP: " + alphaGroup );
-            System.out.println ( "seqElementFormat: " + seqElementFormat );
-            seqElementFormat = seqElementFormat.replace ( alphaGroup, this.processAlphaGroup ( sequence, alphaGroup ) );
+                if ( sequence.getCurrentNumericSequence ( ) == 1 ) {
+                    seqElementFormat = seqElementFormat.replace ( alphaGroup, this.processAlphaGroup ( sequence, alphaGroup, true ) );
+                } else {
+                    seqElementFormat = seqElementFormat.replace ( alphaGroup, this.processAlphaGroup ( sequence, alphaGroup, false ) );
+                }
 
-            System.out.println ( "sequence: " + sequence );
+            }
 
+        } else {
+            //   ALPHA PATTERN
+            Pattern alphaPattern   = Pattern.compile ( alphaPatternString );
+            Matcher alphaMatcher   = alphaPattern.matcher ( seqElementFormat );
+
+            while ( alphaMatcher.find ( ) ) {
+                String alphaGroup = alphaMatcher.group ( );
+                seqElementFormat = seqElementFormat.replace ( alphaGroup, this.processAlphaGroup ( sequence, alphaGroup, true ) );
+            }
+
+            //TODO   FINISH THIS
+            if ( true ) {
+                //   NUMERIC PATTERN
+                Pattern numericPattern = Pattern.compile ( numericPatternString );
+                Matcher numericMatcher = numericPattern.matcher ( seqElementFormat );
+
+                while ( numericMatcher.find ( ) ) {
+                    String numericGroup = numericMatcher.group ( );
+                    seqElementFormat = seqElementFormat.replace ( numericGroup, this.processNumericGroup ( sequence, numericGroup, false ) );
+                }
+            }
         }
 
         sequenceRepository.save ( sequence );
@@ -205,17 +224,14 @@ public class SequenceServiceImpl implements SequenceService {
      *
      * @param sequence
      * @param numericGroup
-     * @return true if the maximum number has been reached, then sequence re-starts on "1", false if business as usual
+     * @return nextNumberStr
      */
-    private String processNumericGroup ( SequenceRec sequence, String numericGroup ) {
+    private String processNumericGroup ( SequenceRec sequence, String numericGroup, boolean increment ) {
 
         int maxDigitsAllowed = numericGroup.length ( ) - 2;
 
-        int nextNumber = 1;
-
-        if ( ( 1 + getDigitsCount ( sequence.getCurrentNumericSequence ( ) ) ) <= maxDigitsAllowed ) {
-            nextNumber = 1 + sequence.getCurrentNumericSequence ( );
-        }
+        int nextNumber =  ( increment ) ? ( sequence.getCurrentNumericSequence ( ) + 1 ) : sequence.getCurrentNumericSequence ( );
+        if ( getDigitsCount ( nextNumber ) > maxDigitsAllowed ) { nextNumber = 1; }
 
         String nextNumberStr = Integer.toString ( nextNumber );
         while ( nextNumberStr.length ( ) < maxDigitsAllowed ) { nextNumberStr = "0" + nextNumberStr; }
@@ -232,11 +248,11 @@ public class SequenceServiceImpl implements SequenceService {
      * @param alphaGroup
      * @return
      */
-    private String processAlphaGroup ( SequenceRec sequence, String alphaGroup ) {
+    private String processAlphaGroup ( SequenceRec sequence, String alphaGroup, boolean increment ) {
 
         String nextAlphaStr = "";
 
-        int currentAlphaSequence = sequence.getCurrentAlphaSequence ( ) + 1;
+        int currentAlphaSequence = ( increment ) ? sequence.getCurrentAlphaSequence ( ) + 1 : sequence.getCurrentAlphaSequence ( );
 
         sequence.setCurrentAlphaSequence ( currentAlphaSequence );
 
