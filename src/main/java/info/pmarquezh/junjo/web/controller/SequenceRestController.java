@@ -1,6 +1,7 @@
 package info.pmarquezh.junjo.web.controller;
 
 //   Standard Libraries Imports
+import java.util.List;
 
 //   Third Party Libraries Imports
 import lombok.extern.java.Log;
@@ -15,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 //   Domain Imports
 import info.pmarquezh.junjo.model.sequence.SequenceRec;
 import info.pmarquezh.junjo.service.SequenceService;
-
 
 /**
  * SequenceRestController.java<br><br>
@@ -153,6 +153,26 @@ public class SequenceRestController {
         if ( generatedElement != null  ) {
 
             return new ResponseEntity ( generatedElement, HttpStatus.OK );
+
+        } else {
+            return new ResponseEntity ( HttpStatus.NOT_FOUND ); //   CORRECT RESPONSE STATUS?
+
+        }
+
+    }
+
+    /**
+     * Generate next "n" elements in the sequence.
+     * @return
+     */
+    @GetMapping( { "generate/{sequenceId}/{quantity}" } )
+    public ResponseEntity<List<String>> generateNextElementsInSequence ( @PathVariable ( "sequenceId" ) String sequenceId, @PathVariable ( "quantity" ) int quantity  ) {
+
+        List<String> generatedElements = sequenceService.getNextElementsInSequence ( sequenceId, quantity );
+
+        if ( generatedElements != null  ) {
+
+            return new ResponseEntity ( generatedElements, HttpStatus.OK );
 
         } else {
             return new ResponseEntity ( HttpStatus.NOT_FOUND ); //   CORRECT RESPONSE STATUS?

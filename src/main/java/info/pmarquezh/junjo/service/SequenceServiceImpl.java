@@ -1,6 +1,8 @@
 package info.pmarquezh.junjo.service;
 
 //   Standard Libraries Imports
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -85,9 +87,9 @@ public class SequenceServiceImpl implements SequenceService {
     @Override
     public SequenceRec retrieveSequence ( String sequenceId ) {
 
-        for ( SequenceRec seq : sequenceRepository.findAll ( ) ) {
-            System.out.println ( seq.getId ( ) + " - " + seq.getSequenceName ( ) );
-        }
+//        for ( SequenceRec seq : sequenceRepository.findAll ( ) ) {
+//            System.out.println ( seq.getId ( ) + " - " + seq.getSequenceName ( ) );
+//        }
 
         if ( sequenceRepository.existsById ( sequenceId ) ) {
             Optional<SequenceRec> sequenceWrapper = sequenceRepository.findById ( sequenceId );
@@ -180,6 +182,39 @@ public class SequenceServiceImpl implements SequenceService {
         sequenceRepository.save ( sequence );
 
         return template;
+    }
+
+    /**
+     * Generates the next element in the sequence [D]
+     *
+     * @param sequenceId
+     * @param quantity
+     * @return List<String></String> The list of generated elements from a sequence or null (if sequenceId is not valid/found).
+     */
+    @Override
+    public List<String> getNextElementsInSequence(String sequenceId, int quantity) {
+
+        SequenceRec sequence = this.retrieveSequence ( sequenceId );
+        String template = sequence.getPattern( );
+        List<String> elements = new ArrayList<> ( );
+
+        if ( sequence.getPriorityType ( ).equals ( "numeric" ) ) {
+            for (int i = 0; i < quantity; i++) {
+                template = this.retrieveNumericPattern(sequence, template);  //   NUMERIC PATTERN
+                template = this.retrieveAlphaPattern(sequence, template);    //   ALPHA PATTERN
+                elements.add ( template );
+            }
+        } else {
+            for (int i = 0; i < quantity; i++) {
+                template = this.retrieveAlphaPattern ( sequence, template );    //   ALPHA PATTERN
+                template = this.retrieveNumericPattern ( sequence, template );  //   NUMERIC PATTERN
+                elements.add ( template );
+            }
+        }
+
+        sequenceRepository.save ( sequence );
+
+        return elements;
     }
 
     /**

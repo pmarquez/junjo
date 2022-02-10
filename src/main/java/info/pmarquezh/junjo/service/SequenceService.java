@@ -10,6 +10,8 @@ package info.pmarquezh.junjo.service;
 
 import info.pmarquezh.junjo.model.sequence.SequenceRec;
 
+import java.util.List;
+
 /**
  * SequenceService.java<br><br>
  * Creation Date 2022-02-08 16:57<br><br>
@@ -69,4 +71,11 @@ public interface SequenceService {
      */
     String getNextInSequence ( String sequenceId );
 
+    /**
+     * Generates the next element in the sequence [D]
+     * @param sequenceId
+     * @param quantity
+     * @return List<String></String> The list of generated elements from a sequence or null (if sequenceId is not valid/found).
+     */
+    List<String> getNextElementsInSequence ( String sequenceId, int quantity );
 }

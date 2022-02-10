@@ -14,6 +14,9 @@ junjo: "sequence" in Japanese, is a microservice that returns the next code in, 
 [OpenAPI Doc] (https://github.com/pmarquez/junjo/blob/main/junjoAPI.yaml)
 
 ## Release Notes
+### v0.7.0
+* Retrieve a series of elements /junjoAPI/1.0/sequences/generate/:sequenceId/:quantity.
+
 ### v0.6.1
 * code refactoring, better structure.
 
