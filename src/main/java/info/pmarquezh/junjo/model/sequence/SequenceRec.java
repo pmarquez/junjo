@@ -44,7 +44,7 @@ public class SequenceRec {
     @Id
     String id;
     String sequenceName;
-    String format;
+    String pattern;
     int    currentNumericSequence;
     int    currentAlphaSequence;
     String currentAlphaRepresentation;

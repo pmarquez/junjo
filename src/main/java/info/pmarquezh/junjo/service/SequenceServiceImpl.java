@@ -65,7 +65,7 @@ public class SequenceServiceImpl implements SequenceService {
     public String persistSequence(SequenceRec sequence) {
         SequenceRec newSequence = SequenceRec.builder ( ).id ( UUID.randomUUID ( ).toString ( ) )
                                                          .sequenceName ( sequence.getSequenceName ( ) )
-                                                         .format ( sequence.getFormat ( ) )
+                                                         .pattern( sequence.getPattern( ) )
                                                          .currentNumericSequence ( sequence.getCurrentNumericSequence ( ) )
                                                          .currentAlphaSequence ( sequence.getCurrentAlphaSequence ( ) )
                                                          .priorityType ( sequence.getPriorityType ( ) )
@@ -116,7 +116,7 @@ public class SequenceServiceImpl implements SequenceService {
         if ( dbSequence != null ) {
 
             dbSequence.setSequenceName ( sequence.getSequenceName ( ) );
-            dbSequence.setFormat ( sequence.getFormat ( ) );
+            dbSequence.setPattern( sequence.getPattern( ) );
             dbSequence.setCurrentAlphaSequence ( sequence.getCurrentAlphaSequence ( ) );
             dbSequence.setCurrentNumericSequence ( sequence.getCurrentNumericSequence ( ) );
             dbSequence.setPriorityType ( sequence.getPriorityType ( ) );
@@ -165,59 +165,63 @@ public class SequenceServiceImpl implements SequenceService {
 
         SequenceRec sequence = this.retrieveSequence ( sequenceId );
 
-        String seqElementFormat = sequence.getFormat ( );
+        String template = sequence.getPattern( );
 
         if ( sequence.getPriorityType ( ).equals ( "numeric" ) ) {
-            //   NUMERIC PATTERN
-            Pattern numericPattern = Pattern.compile ( numericPatternString );
-            Matcher numericMatcher = numericPattern.matcher ( seqElementFormat );
-
-            while ( numericMatcher.find ( ) ) {
-                String numericGroup = numericMatcher.group ( );
-                seqElementFormat = seqElementFormat.replace ( numericGroup, this.processNumericGroup ( sequence, numericGroup, true ) );
-            }
-
-            //   ALPHA PATTERN
-            Pattern alphaPattern   = Pattern.compile ( alphaPatternString );
-            Matcher alphaMatcher   = alphaPattern.matcher ( seqElementFormat );
-
-            while ( alphaMatcher.find ( ) ) {
-                String alphaGroup = alphaMatcher.group ( );
-
-                if ( sequence.getCurrentNumericSequence ( ) == 1 ) {
-                    seqElementFormat = seqElementFormat.replace ( alphaGroup, this.processAlphaGroup ( sequence, alphaGroup, true ) );
-                } else {
-                    seqElementFormat = seqElementFormat.replace ( alphaGroup, this.processAlphaGroup ( sequence, alphaGroup, false ) );
-                }
-
-            }
+            template = this.retrieveNumericPattern ( sequence, template );  //   NUMERIC PATTERN
+            template = this.retrieveAlphaPattern ( sequence, template );    //   ALPHA PATTERN
 
         } else {
-            //   ALPHA PATTERN
-            Pattern alphaPattern   = Pattern.compile ( alphaPatternString );
-            Matcher alphaMatcher   = alphaPattern.matcher ( seqElementFormat );
+            template = this.retrieveAlphaPattern ( sequence, template );    //   ALPHA PATTERN
+            template = this.retrieveNumericPattern ( sequence, template );  //   NUMERIC PATTERN
 
-            while ( alphaMatcher.find ( ) ) {
-                String alphaGroup = alphaMatcher.group ( );
-                seqElementFormat = seqElementFormat.replace ( alphaGroup, this.processAlphaGroup ( sequence, alphaGroup, true ) );
-            }
-
-            //TODO   FINISH THIS
-            if ( true ) {
-                //   NUMERIC PATTERN
-                Pattern numericPattern = Pattern.compile ( numericPatternString );
-                Matcher numericMatcher = numericPattern.matcher ( seqElementFormat );
-
-                while ( numericMatcher.find ( ) ) {
-                    String numericGroup = numericMatcher.group ( );
-                    seqElementFormat = seqElementFormat.replace ( numericGroup, this.processNumericGroup ( sequence, numericGroup, false ) );
-                }
-            }
         }
 
         sequenceRepository.save ( sequence );
 
-        return seqElementFormat;
+        return template;
+    }
+
+    /**
+     *
+     * @param sequence
+     * @param template
+     */
+    private String retrieveNumericPattern ( SequenceRec sequence, String template ) {
+
+        Pattern numericPattern = Pattern.compile ( numericPatternString );
+        Matcher numericMatcher = numericPattern.matcher ( template );
+
+        while ( numericMatcher.find ( ) ) {
+            String numericGroup = numericMatcher.group ( );
+            template = template.replace ( numericGroup, this.processNumericGroup ( sequence, numericGroup, true ) );
+        }
+
+        return template;
+    }
+
+    /**
+     *
+     * @param sequence
+     * @param template
+     */
+    private String retrieveAlphaPattern ( SequenceRec sequence, String template ) {
+
+        Pattern alphaPattern   = Pattern.compile ( alphaPatternString );
+        Matcher alphaMatcher   = alphaPattern.matcher ( template );
+
+        while ( alphaMatcher.find ( ) ) {
+            String alphaGroup = alphaMatcher.group ( );
+
+            if ( sequence.getCurrentNumericSequence ( ) == 1 ) {
+                template = template.replace ( alphaGroup, this.processAlphaGroup ( sequence, alphaGroup, true ) );
+            } else {
+                template = template.replace ( alphaGroup, this.processAlphaGroup ( sequence, alphaGroup, false ) );
+            }
+
+        }
+
+        return template;
     }
 
     /**
