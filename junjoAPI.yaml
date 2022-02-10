@@ -97,6 +97,34 @@ paths:
           description: Not Found
       operationId: get-1.0-sequences-generate-sequenceId
       description: Generates and returns a String containing the next element in the sequence represented by sequenceId.
+  '/junjoAPI/1.0/sequences/generate/{sequenceId}/{quantity}':
+    parameters:
+      - schema:
+          type: string
+        name: sequenceId
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: quantity
+        in: path
+        required: true
+    get:
+      summary: 'Generate Next {quantity} Elements in Sequence'
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        '404':
+          description: Not Found
+      operationId: get-1.0-sequences-generate-sequenceId-quantity
+      description: Generates a series of elements instead of only the next one in line.
 components:
   schemas:
     SequenceRec:
@@ -107,16 +135,18 @@ components:
         Sequence already in use:
           id: 78ebab54-884d-11ec-a8a3-0242ac120002
           sequenceName: SKUs
-          format: '{AA}-{NNNN}'
+          format: '{AAA}-{NNNN}'
           currentNumericSequence: 149
-          currentAlphaSequence: AD
+          currentAlphaSequence: 7062
+          currentAlphaRepresentation: JKQ
           priorityType: numeric
         New Sequence:
           id: 78ebab52-884d-11ec-a8a3-0242ac120002
           sequenceName: SKUs
           format: '{AA}-{NNNN}'
           currentNumericSequence: 0
-          currentAlphaSequence: AA
+          currentAlphaSequence: 0
+          currentAlphaRepresentation: ''
           priorityType: numeric
       properties:
         id:
@@ -128,6 +158,16 @@ components:
         currentNumericSequence:
           type: integer
         currentAlphaSequence:
+          type: integer
+        currentAlphaRepresentation:
           type: string
         priorityType:
           type: string
+          description: 'Priority Type can be either numeric or alpha. If numeric, then the numeric part of the sequence will get exhausted and rolled-over, before the alpha part increases, if alpha, well, then it is the other way around.'
+      required:
+        - id
+        - sequenceName
+        - format
+        - currentNumericSequence
+        - currentAlphaSequence
+        - priorityType
