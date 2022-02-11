@@ -300,13 +300,18 @@ public class SequenceServiceImpl implements SequenceService {
         return transformSequenceToRepresentation ( currentAlphaSequence );
     }
 
+    private static final int    CHAR_FOR_A            = 65;
+    private static final int    NUM_CHARS_FROM_A_TO_Z = 26;
+    private static final int    NUMBER_ONE            =  1;
+    private static final String BLANK                 =  "";
+
     /**
      *
      * @param alphaSequence
      * @return
      */
     private String transformSequenceToRepresentation ( int alphaSequence ) {
-        return alphaSequence < 0 ? "" : transformSequenceToRepresentation (( alphaSequence / 26 ) - 1 ) + ( char ) ( 65 + alphaSequence % 26 );
+        return alphaSequence < 0 ? BLANK : transformSequenceToRepresentation (( alphaSequence / NUM_CHARS_FROM_A_TO_Z ) - NUMBER_ONE ) + ( char ) ( CHAR_FOR_A + alphaSequence % NUM_CHARS_FROM_A_TO_Z );
     }
 
     /**
