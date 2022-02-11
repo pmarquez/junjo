@@ -195,17 +195,19 @@ public class SequenceServiceImpl implements SequenceService {
     public List<String> getNextElementsInSequence(String sequenceId, int quantity) {
 
         SequenceRec sequence = this.retrieveSequence ( sequenceId );
-        String template = sequence.getPattern( );
+        String template;
         List<String> elements = new ArrayList<> ( );
 
         if ( sequence.getPriorityType ( ).equals ( "numeric" ) ) {
             for (int i = 0; i < quantity; i++) {
+                template = sequence.getPattern( );
                 template = this.retrieveNumericPattern(sequence, template);  //   NUMERIC PATTERN
                 template = this.retrieveAlphaPattern(sequence, template);    //   ALPHA PATTERN
                 elements.add ( template );
             }
         } else {
             for (int i = 0; i < quantity; i++) {
+                template = sequence.getPattern( );
                 template = this.retrieveAlphaPattern ( sequence, template );    //   ALPHA PATTERN
                 template = this.retrieveNumericPattern ( sequence, template );  //   NUMERIC PATTERN
                 elements.add ( template );
