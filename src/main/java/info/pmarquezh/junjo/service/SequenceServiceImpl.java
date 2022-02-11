@@ -156,6 +156,15 @@ public class SequenceServiceImpl implements SequenceService {
 
     }
 
+    /*********************************************************************/
+    /*********************************************************************/
+    /******* ACTUAL FUNCTIONALITY - BEGIN ********************************/
+    /*********************************************************************/
+    /*********************************************************************/
+
+    private SequenceRec sequence;
+    private String      template;
+
     /**
      * Generates the next element in the sequence.
      *
@@ -165,17 +174,16 @@ public class SequenceServiceImpl implements SequenceService {
     @Override
     public String getNextInSequence ( String sequenceId ) {
 
-        SequenceRec sequence = this.retrieveSequence ( sequenceId );
-
-        String template = sequence.getPattern( );
+        sequence = this.retrieveSequence ( sequenceId );
+        template = sequence.getPattern( );
 
         if ( sequence.getPriorityType ( ).equals ( "numeric" ) ) {
-            template = this.retrieveNumericPattern ( sequence, template );  //   NUMERIC PATTERN
-            template = this.retrieveAlphaPattern ( sequence, template );    //   ALPHA PATTERN
+            template = this.retrieveNumericPattern ( );  //   NUMERIC PATTERN
+            template = this.retrieveAlphaPattern ( );    //   ALPHA PATTERN
 
         } else {
-            template = this.retrieveAlphaPattern ( sequence, template );    //   ALPHA PATTERN
-            template = this.retrieveNumericPattern ( sequence, template );  //   NUMERIC PATTERN
+            template = this.retrieveAlphaPattern ( );    //   ALPHA PATTERN
+            template = this.retrieveNumericPattern ( );  //   NUMERIC PATTERN
 
         }
 
@@ -192,24 +200,24 @@ public class SequenceServiceImpl implements SequenceService {
      * @return List<String></String> The list of generated elements from a sequence or null (if sequenceId is not valid/found).
      */
     @Override
-    public List<String> getNextElementsInSequence(String sequenceId, int quantity) {
+    public List<String> getNextElementsInSequence ( String sequenceId, int quantity ) {
 
-        SequenceRec sequence = this.retrieveSequence ( sequenceId );
-        String template;
+        sequence = this.retrieveSequence ( sequenceId );
+
         List<String> elements = new ArrayList<> ( );
 
         if ( sequence.getPriorityType ( ).equals ( "numeric" ) ) {
             for (int i = 0; i < quantity; i++) {
                 template = sequence.getPattern( );
-                template = this.retrieveNumericPattern(sequence, template);  //   NUMERIC PATTERN
-                template = this.retrieveAlphaPattern(sequence, template);    //   ALPHA PATTERN
+                template = this.retrieveNumericPattern( );  //   NUMERIC PATTERN
+                template = this.retrieveAlphaPattern  ( );  //   ALPHA PATTERN
                 elements.add ( template );
             }
         } else {
             for (int i = 0; i < quantity; i++) {
                 template = sequence.getPattern( );
-                template = this.retrieveAlphaPattern ( sequence, template );    //   ALPHA PATTERN
-                template = this.retrieveNumericPattern ( sequence, template );  //   NUMERIC PATTERN
+                template = this.retrieveAlphaPattern   ( );  //   ALPHA PATTERN
+                template = this.retrieveNumericPattern ( );  //   NUMERIC PATTERN
                 elements.add ( template );
             }
         }
@@ -221,17 +229,15 @@ public class SequenceServiceImpl implements SequenceService {
 
     /**
      *
-     * @param sequence
-     * @param template
      */
-    private String retrieveNumericPattern ( SequenceRec sequence, String template ) {
+    private String retrieveNumericPattern ( ) {
 
         Pattern numericPattern = Pattern.compile ( numericPatternString );
         Matcher numericMatcher = numericPattern.matcher ( template );
 
         while ( numericMatcher.find ( ) ) {
             String numericGroup = numericMatcher.group ( );
-            template = template.replace ( numericGroup, this.processNumericGroup ( sequence, numericGroup, true ) );
+            template = template.replace ( numericGroup, this.processNumericGroup ( numericGroup, true ) );
         }
 
         return template;
@@ -239,10 +245,8 @@ public class SequenceServiceImpl implements SequenceService {
 
     /**
      *
-     * @param sequence
-     * @param template
      */
-    private String retrieveAlphaPattern ( SequenceRec sequence, String template ) {
+    private String retrieveAlphaPattern ( ) {
 
         Pattern alphaPattern   = Pattern.compile ( alphaPatternString );
         Matcher alphaMatcher   = alphaPattern.matcher ( template );
@@ -251,9 +255,9 @@ public class SequenceServiceImpl implements SequenceService {
             String alphaGroup = alphaMatcher.group ( );
 
             if ( sequence.getCurrentNumericSequence ( ) == 1 ) {
-                template = template.replace ( alphaGroup, this.processAlphaGroup ( sequence, alphaGroup, true ) );
+                template = template.replace ( alphaGroup, this.processAlphaGroup ( alphaGroup, true ) );
             } else {
-                template = template.replace ( alphaGroup, this.processAlphaGroup ( sequence, alphaGroup, false ) );
+                template = template.replace ( alphaGroup, this.processAlphaGroup ( alphaGroup, false ) );
             }
 
         }
@@ -263,11 +267,10 @@ public class SequenceServiceImpl implements SequenceService {
 
     /**
      *
-     * @param sequence
      * @param numericGroup
      * @return nextNumberStr
      */
-    private String processNumericGroup ( SequenceRec sequence, String numericGroup, boolean increment ) {
+    private String processNumericGroup ( String numericGroup, boolean increment ) {
 
         int maxDigitsAllowed = numericGroup.length ( ) - 2;
 
@@ -285,11 +288,10 @@ public class SequenceServiceImpl implements SequenceService {
 
     /**
      *
-     * @param sequence
      * @param alphaGroup
      * @return
      */
-    private String processAlphaGroup ( SequenceRec sequence, String alphaGroup, boolean increment ) {
+    private String processAlphaGroup ( String alphaGroup, boolean increment ) {
 
         String nextAlphaStr = "";
 
