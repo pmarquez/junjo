@@ -13,12 +13,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-//   FENIX Framework Imports
+//   ns Framework Imports
 
 //   Domain Imports
 import info.pmarquezh.junjo.model.sequence.SequenceRec;
 import info.pmarquezh.junjo.repository.SequenceRepository;
-
 
 /**
  * SequenceServiceImpl.java<br><br>
@@ -165,6 +164,9 @@ public class SequenceServiceImpl implements SequenceService {
     private SequenceRec sequence;
     private String      template;
 
+    private boolean     numericRollover = false;
+    private boolean     alphaRollover   = false;
+
     /**
      * Generates the next element in the sequence.
      *
@@ -197,7 +199,7 @@ public class SequenceServiceImpl implements SequenceService {
      *
      * @param sequenceId
      * @param quantity
-     * @return List<String></String> The list of generated elements from a sequence or null (if sequenceId is not valid/found).
+     * @return List<String> The list of generated elements from a sequence or null (if sequenceId is not valid/found).
      */
     @Override
     public List<String> getNextElementsInSequence ( String sequenceId, int quantity ) {
@@ -208,17 +210,25 @@ public class SequenceServiceImpl implements SequenceService {
 
         if ( sequence.getPriorityType ( ).equals ( "numeric" ) ) {
             for (int i = 0; i < quantity; i++) {
-                template = sequence.getPattern( );
-                template = this.retrieveNumericPattern( );  //   NUMERIC PATTERN
-                template = this.retrieveAlphaPattern  ( );  //   ALPHA PATTERN
+                template = sequence.getPattern ( );
+                template = this.retrieveNumericPattern ( );  //   NUMERIC PATTERN
+                template = this.retrieveAlphaPattern   ( );  //   ALPHA PATTERN
+
                 elements.add ( template );
+
+                numericRollover = false;
+                alphaRollover   = false;
             }
         } else {
             for (int i = 0; i < quantity; i++) {
                 template = sequence.getPattern( );
                 template = this.retrieveAlphaPattern   ( );  //   ALPHA PATTERN
                 template = this.retrieveNumericPattern ( );  //   NUMERIC PATTERN
+
                 elements.add ( template );
+
+                alphaRollover   = false;
+                numericRollover = false;
             }
         }
 
@@ -229,6 +239,7 @@ public class SequenceServiceImpl implements SequenceService {
 
     /**
      *
+     * @return
      */
     private String retrieveNumericPattern ( ) {
 
@@ -245,6 +256,7 @@ public class SequenceServiceImpl implements SequenceService {
 
     /**
      *
+     * @return
      */
     private String retrieveAlphaPattern ( ) {
 
@@ -253,13 +265,7 @@ public class SequenceServiceImpl implements SequenceService {
 
         while ( alphaMatcher.find ( ) ) {
             String alphaGroup = alphaMatcher.group ( );
-
-            if ( sequence.getCurrentNumericSequence ( ) == 1 ) {
-                template = template.replace ( alphaGroup, this.processAlphaGroup ( alphaGroup, true ) );
-            } else {
-                template = template.replace ( alphaGroup, this.processAlphaGroup ( alphaGroup, false ) );
-            }
-
+            template = template.replace ( alphaGroup, this.processAlphaGroup ( alphaGroup, numericRollover ) );
         }
 
         return template;
@@ -275,10 +281,13 @@ public class SequenceServiceImpl implements SequenceService {
         int maxDigitsAllowed = numericGroup.length ( ) - 2;
 
         int nextNumber =  ( increment ) ? ( sequence.getCurrentNumericSequence ( ) + 1 ) : sequence.getCurrentNumericSequence ( );
-        if ( getDigitsCount ( nextNumber ) > maxDigitsAllowed ) { nextNumber = 1; }
+        if ( getDigitsCount ( nextNumber ) > maxDigitsAllowed ) {
+            nextNumber = 1;
+            numericRollover = true;
+        }
 
         String nextNumberStr = Integer.toString ( nextNumber );
-        while ( nextNumberStr.length ( ) < maxDigitsAllowed ) { nextNumberStr = "0" + nextNumberStr; }
+               nextNumberStr = this.leftPad ( nextNumberStr, maxDigitsAllowed, "0" );
 
         sequence.setCurrentNumericSequence ( nextNumber );
 
@@ -294,12 +303,29 @@ public class SequenceServiceImpl implements SequenceService {
     private String processAlphaGroup ( String alphaGroup, boolean increment ) {
 
         String nextAlphaStr = "";
+        int currentAlphaSequence = 0;
 
-        int currentAlphaSequence = ( increment ) ? sequence.getCurrentAlphaSequence ( ) + 1 : sequence.getCurrentAlphaSequence ( );
+        if ( sequence.getPriorityType ( ).equals ( "numeric" ) ) {
+            currentAlphaSequence = ( increment ) ? sequence.getCurrentAlphaSequence ( ) + 1 : sequence.getCurrentAlphaSequence ( );
+
+        } else {
+            currentAlphaSequence = sequence.getCurrentAlphaSequence ( ) + 1;
+
+        }
 
         sequence.setCurrentAlphaSequence ( currentAlphaSequence );
 
         return transformSequenceToRepresentation ( currentAlphaSequence );
+    }
+
+    /**
+     *
+     * @param num
+     * @return
+     */
+    private int getDigitsCount ( int num ) {
+        String numAsString = Integer.toString ( num );
+        return numAsString.length ( );
     }
 
     private static final int    CHAR_FOR_A            = 65;
@@ -318,12 +344,19 @@ public class SequenceServiceImpl implements SequenceService {
 
     /**
      *
-     * @param num
+     * @param targetStr
+     * @param maxDigitsAllowed
+     * @param paddingChar
      * @return
      */
-    private int getDigitsCount ( int num ) {
-        String numAsString = Integer.toString ( num );
-        return numAsString.length ( );
+    private String leftPad ( String targetStr, int maxDigitsAllowed, String paddingChar) {
+        String theString = targetStr;
+
+        while ( theString.length ( ) < maxDigitsAllowed ) {
+            theString = paddingChar + theString;
+        }
+
+        return theString;
     }
 
 }

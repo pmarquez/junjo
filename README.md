@@ -13,6 +13,9 @@ junjo: "sequence" in Japanese, is a microservice that returns the next code in, 
 ## junjo OpenAPI Doc
 [OpenAPI Doc] (https://github.com/pmarquez/junjo/blob/main/junjoAPI.yaml)
 
+## junjo Docker Repo
+[docker pull pmarquezh/junjo](https://hub.docker.com/r/pmarquezh/junjo)
+
 ## Release Notes
 ### v0.7.0
 * Retrieve a series of elements /junjoAPI/1.0/sequences/generate/:sequenceId/:quantity.
