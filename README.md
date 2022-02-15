@@ -1,6 +1,19 @@
 # junjo
 junjo: "sequence" in Japanese, is a microservice that returns the next code in, well, a sequence or series.
 
+```mermaid
+sequenceDiagram
+    participant dotcom
+    participant iframe
+    participant viewscreen
+    dotcom->>iframe: loads html w/ iframe url
+    iframe->>viewscreen: request template
+    viewscreen->>iframe: html & javascript
+    iframe->>dotcom: iframe ready
+    dotcom->>iframe: set mermaid data on iframe
+    iframe->>iframe: render mermaid
+```
+
 ## Requirements
 * JBoss Undertow 2.2.14.Final or newer
 * MongoDB 4.0.9 or newer
