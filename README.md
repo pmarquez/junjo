@@ -17,6 +17,10 @@ junjo: "sequence" in Japanese, is a microservice that returns the next code in, 
 [docker pull pmarquezh/junjo](https://hub.docker.com/r/pmarquezh/junjo)
 
 ## Release Notes
+
+### v0.7.1
+* MongoDB collection now is named "sequences".
+
 ### v0.7.0
 * Retrieve a series of elements /junjoAPI/1.0/sequences/generate/:sequenceId/:quantity.
 
