@@ -1,6 +1,7 @@
 package info.pmarquezh.junjo.service;
 
 //   Standard Libraries Imports
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -9,6 +10,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 //   Third Party Libraries Imports
+import lombok.extern.java.Log;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -41,13 +44,20 @@ import info.pmarquezh.junjo.repository.SequenceRepository;
  * @author pmarquezh
  * @version 1.0 - 2022-02-08 16:58
  */
+@Log
 @Service
 public class SequenceServiceImpl implements SequenceService {
+
+    private static final String PRIORITY_NUMERIC = "numeric";
 
     @Value("${info.pmarquezh.junjo.numericPattern}")
     private String      numericPatternString;
     @Value("${info.pmarquezh.junjo.alphaPattern}")
     private String      alphaPatternString;
+    @Value("${info.pmarquezh.junjo.yearPattern}")
+    private String      yearPatternString;
+    @Value ( "${info.pmarquezh.junjo.defaultNumericPadChar}" )
+    private String      defaultNumericPadChar;
 
     private SequenceRepository sequenceRepository;
 
@@ -64,6 +74,7 @@ public class SequenceServiceImpl implements SequenceService {
      */
     @Override
     public String persistSequence(SequenceRec sequence) {
+
         SequenceRec newSequence = SequenceRec.builder ( ).id ( UUID.randomUUID ( ).toString ( ) )
                                                          .sequenceName ( sequence.getSequenceName ( ) )
                                                          .pattern( sequence.getPattern( ) )
@@ -86,19 +97,9 @@ public class SequenceServiceImpl implements SequenceService {
     @Override
     public SequenceRec retrieveSequence ( String sequenceId ) {
 
-//        for ( SequenceRec seq : sequenceRepository.findAll ( ) ) {
-//            System.out.println ( seq.getId ( ) + " - " + seq.getSequenceName ( ) );
-//        }
+        Optional<SequenceRec> sequenceWrapper = sequenceRepository.findById ( sequenceId );
 
-        if ( sequenceRepository.existsById ( sequenceId ) ) {
-            Optional<SequenceRec> sequenceWrapper = sequenceRepository.findById ( sequenceId );
-
-            return sequenceWrapper.get ( );
-
-        } else {
-            return null;
-
-        }
+        return ( sequenceWrapper.isPresent ( ) ) ? sequenceWrapper.get ( ) : null;
 
     }
 
@@ -165,7 +166,6 @@ public class SequenceServiceImpl implements SequenceService {
     private String      template;
 
     private boolean     numericRollover = false;
-    private boolean     alphaRollover   = false;
 
     /**
      * Generates the next element in the sequence.
@@ -179,7 +179,8 @@ public class SequenceServiceImpl implements SequenceService {
         sequence = this.retrieveSequence ( sequenceId );
         template = sequence.getPattern( );
 
-        if ( sequence.getPriorityType ( ).equals ( "numeric" ) ) {
+        //   YEAR PATTERN
+        if ( sequence.getPriorityType ( ).equals ( PRIORITY_NUMERIC ) ) {
             template = this.retrieveNumericPattern ( );  //   NUMERIC PATTERN
             template = this.retrieveAlphaPattern ( );    //   ALPHA PATTERN
 
@@ -188,6 +189,7 @@ public class SequenceServiceImpl implements SequenceService {
             template = this.retrieveNumericPattern ( );  //   NUMERIC PATTERN
 
         }
+        template = this.retrieveYearPattern    ( );  //   YEAR PATTERN
 
         sequenceRepository.save ( sequence );
 
@@ -195,7 +197,7 @@ public class SequenceServiceImpl implements SequenceService {
     }
 
     /**
-     * Generates the next element in the sequence [D]
+     * Generates the next elements in the sequence [D]
      *
      * @param sequenceId
      * @param quantity
@@ -208,26 +210,27 @@ public class SequenceServiceImpl implements SequenceService {
 
         List<String> elements = new ArrayList<> ( );
 
-        if ( sequence.getPriorityType ( ).equals ( "numeric" ) ) {
+        if ( sequence.getPriorityType ( ).equals ( PRIORITY_NUMERIC ) ) {
             for (int i = 0; i < quantity; i++) {
                 template = sequence.getPattern ( );
                 template = this.retrieveNumericPattern ( );  //   NUMERIC PATTERN
                 template = this.retrieveAlphaPattern   ( );  //   ALPHA PATTERN
+                template = this.retrieveYearPattern    ( );  //   YEAR PATTERN
 
                 elements.add ( template );
 
                 numericRollover = false;
-                alphaRollover   = false;
             }
+
         } else {
             for (int i = 0; i < quantity; i++) {
                 template = sequence.getPattern( );
                 template = this.retrieveAlphaPattern   ( );  //   ALPHA PATTERN
                 template = this.retrieveNumericPattern ( );  //   NUMERIC PATTERN
+                template = this.retrieveYearPattern    ( );  //   YEAR PATTERN
 
                 elements.add ( template );
 
-                alphaRollover   = false;
                 numericRollover = false;
             }
         }
@@ -236,6 +239,8 @@ public class SequenceServiceImpl implements SequenceService {
 
         return elements;
     }
+
+/*  NUMERIC GROUP - BEGIN */
 
     /**
      *
@@ -256,6 +261,36 @@ public class SequenceServiceImpl implements SequenceService {
 
     /**
      *
+     * @param numericGroup
+     * @return nextNumberStr
+     */
+    private String processNumericGroup ( String numericGroup, boolean increment ) {
+
+        log.info ( "numericGroup: " + numericGroup );
+
+        int maxDigitsAllowed = numericGroup.length ( ) - 2;
+
+        int nextNumber =  ( increment ) ? ( sequence.getCurrentNumericSequence ( ) + 1 ) : sequence.getCurrentNumericSequence ( );
+        if ( getDigitsCount ( nextNumber ) > maxDigitsAllowed ) {
+            nextNumber = 1;
+            numericRollover = true;
+        }
+
+        String nextNumberStr = Integer.toString ( nextNumber );
+               nextNumberStr = StringUtils.leftPad ( nextNumberStr, maxDigitsAllowed, defaultNumericPadChar );
+
+        sequence.setCurrentNumericSequence ( nextNumber );
+
+        return nextNumberStr;
+
+    }
+
+    /*  NUMERIC GROUP - END */
+
+    /*  ALPHA GROUP - BEGIN */
+
+    /**
+     *
      * @return
      */
     private String retrieveAlphaPattern ( ) {
@@ -273,39 +308,16 @@ public class SequenceServiceImpl implements SequenceService {
 
     /**
      *
-     * @param numericGroup
-     * @return nextNumberStr
-     */
-    private String processNumericGroup ( String numericGroup, boolean increment ) {
-
-        int maxDigitsAllowed = numericGroup.length ( ) - 2;
-
-        int nextNumber =  ( increment ) ? ( sequence.getCurrentNumericSequence ( ) + 1 ) : sequence.getCurrentNumericSequence ( );
-        if ( getDigitsCount ( nextNumber ) > maxDigitsAllowed ) {
-            nextNumber = 1;
-            numericRollover = true;
-        }
-
-        String nextNumberStr = Integer.toString ( nextNumber );
-               nextNumberStr = this.leftPad ( nextNumberStr, maxDigitsAllowed, "0" );
-
-        sequence.setCurrentNumericSequence ( nextNumber );
-
-        return nextNumberStr;
-
-    }
-
-    /**
-     *
      * @param alphaGroup
      * @return
      */
     private String processAlphaGroup ( String alphaGroup, boolean increment ) {
 
-        String nextAlphaStr = "";
+        log.info ( "alphaGroup: " + alphaGroup );
+
         int currentAlphaSequence = 0;
 
-        if ( sequence.getPriorityType ( ).equals ( "numeric" ) ) {
+        if ( sequence.getPriorityType ( ).equals ( PRIORITY_NUMERIC ) ) {
             currentAlphaSequence = ( increment ) ? sequence.getCurrentAlphaSequence ( ) + 1 : sequence.getCurrentAlphaSequence ( );
 
         } else {
@@ -317,6 +329,49 @@ public class SequenceServiceImpl implements SequenceService {
 
         return transformSequenceToRepresentation ( currentAlphaSequence );
     }
+
+    /*  ALPHA GROUP - END */
+
+    /*  YEAR GROUP - BEGIN */
+
+    /**
+     * Creates the necessary matcher to "match" a YEAR pattern in a sequence template.
+     * @return
+     */
+    private String retrieveYearPattern ( ) {
+
+        Pattern yearPattern    = Pattern.compile ( yearPatternString );
+        Matcher yearMatcher   = yearPattern.matcher ( template );
+
+        while ( yearMatcher.find ( ) ) {
+            String yearGroup = yearMatcher.group ( );
+            template = template.replace ( yearGroup, this.processYearGroup ( yearGroup ) );
+        }
+
+        return template;
+    }
+
+    /**
+     * Returns current year as a String.
+     * Either a LONG_YEAR (4 digits year, e.g.: 2022) or a SHORT_YEAR (2 digits year, e.g.: 22).
+     * Defaults to LONG_YEAR.
+     * @param yearGroup
+     * @return
+     */
+    private String processYearGroup ( String yearGroup ) {
+        log.info ( "yearGroup: " + yearGroup );
+
+        String yearRepresentation = String.valueOf ( LocalDate.now ( ).getYear ( ) );
+
+        if ( ( yearGroup.length ( ) - 2 ) == 2 ) {
+            yearRepresentation = yearRepresentation.substring ( 2, 4 );
+        }
+
+        return yearRepresentation;
+    }
+
+    /*  YEAR GROUP - END */
+
 
     /**
      *
@@ -340,23 +395,6 @@ public class SequenceServiceImpl implements SequenceService {
      */
     private String transformSequenceToRepresentation ( int alphaSequence ) {
         return alphaSequence < 0 ? BLANK : transformSequenceToRepresentation (( alphaSequence / NUM_CHARS_FROM_A_TO_Z ) - NUMBER_ONE ) + ( char ) ( CHAR_FOR_A + alphaSequence % NUM_CHARS_FROM_A_TO_Z );
-    }
-
-    /**
-     *
-     * @param targetStr
-     * @param maxDigitsAllowed
-     * @param paddingChar
-     * @return
-     */
-    private String leftPad ( String targetStr, int maxDigitsAllowed, String paddingChar) {
-        String theString = targetStr;
-
-        while ( theString.length ( ) < maxDigitsAllowed ) {
-            theString = paddingChar + theString;
-        }
-
-        return theString;
     }
 
 }

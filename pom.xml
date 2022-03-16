@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>info.pmarquezh</groupId>
 	<artifactId>junjo</artifactId>
-	<version>0.7.0</version>
+	<version>0.8.0</version>
 	<name>junjo</name>
 	<description>Junjo, &quot;sequence&quot; in Japanese, is a microservice that returns the next code in, well, a sequence or series.</description>
 
@@ -112,7 +112,11 @@
 			<optional>true</optional>
 		</dependency>
 		<!-- spring-boot-configuration-processor -->
-
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.12.0</version>
+		</dependency>
 <!-- OpenTelemetry - Sleuth-->
 
 <!--
