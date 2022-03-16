@@ -18,6 +18,9 @@ junjo: "sequence" in Japanese, is a microservice that returns the next code in, 
 
 ## Release Notes
 
+### v0.8.0
+* Added YEAR pattern as LONG_YEAR "{YYYY}" or SHORT_YEAR "{YY}". the value defaults to the current year. If a year pattern does not comply with the expected format, it defaults to the LONG-YEAR "{YYYY}"
+
 ### v0.7.1
 * MongoDB collection now is named "sequences".
 
