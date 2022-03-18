@@ -18,6 +18,8 @@ junjo: "sequence" in Japanese, is a microservice that returns the next code in, 
 
 ## Release Notes
 
+JUST CHECKING WHAT THIS DOES.
+
 ### v0.8.0
 * Added YEAR pattern as LONG_YEAR "{YYYY}" or SHORT_YEAR "{YY}". the value defaults to the current year. If a year pattern does not comply with the expected format, it defaults to the LONG-YEAR "{YYYY}"
 
