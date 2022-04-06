@@ -9,9 +9,12 @@ info:
   license:
     name: Apache 2.0
     url: 'https://www.apache.org/licenses/LICENSE-2.0'
+  description: junjo API 1.0 complete enough for the MVP.
 servers:
   - url: 'http://localhost:8100'
     description: Local
+  - url: 'http://172.18.0.100:8100'
+    description: Docker Network
 paths:
   /junjoAPI/1.0/sequences:
     post:
@@ -30,6 +33,15 @@ paths:
               $ref: '#/components/schemas/SequenceRec'
         description: SequenceRec with the initial data.
     parameters: []
+    get:
+      summary: ''
+      operationId: get-junjoAPI-1.0-sequences
+      responses:
+        '200':
+          description: OK
+        '404':
+          description: Nothing Found
+      description: Retrieves all sequence definitions in storage.
   '/junjoAPI/1.0/sequences/{sequenceId}':
     parameters:
       - schema:

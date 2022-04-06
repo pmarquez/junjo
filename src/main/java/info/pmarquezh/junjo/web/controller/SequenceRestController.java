@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 //   Domain Imports
 import info.pmarquezh.junjo.model.sequence.SequenceRec;
 import info.pmarquezh.junjo.service.SequenceService;
+import info.pmarquezh.junjo.mapper.SequenceMapper;
+import info.pmarquezh.junjo.model.sequence.SequenceDTO;
 
 /**
  * SequenceRestController.java<br><br>
@@ -60,26 +62,41 @@ public class SequenceRestController {
      * @return
      */
     @PostMapping( { "" } )
-    public ResponseEntity<Void> persistSequence ( @RequestBody SequenceRec sequence ) {
+    public ResponseEntity<Void> persistSequence ( @RequestBody SequenceDTO sequenceDTO ) {
 
-//TODO ADD THE STATUSES WHERE CREATION WAS NOT POSSIBLE (Failed Validations, DB Errors, etc.)
+        SequenceMapper sequenceMapper = new SequenceMapper ( );
+        SequenceRec sequence = sequenceMapper.toSequence ( sequenceDTO );
 
-        String newSequenceId = sequenceService.persistSequence(sequence);
+        String newSequenceId = sequenceService.persistSequence ( sequence );
 
         if (!newSequenceId.equals("")) {
             HttpHeaders headers = new HttpHeaders();
             headers.add("Location", newSequenceId);
-
-            return new ResponseEntity(headers, HttpStatus.CREATED);
-
+            return new ResponseEntity<>(headers, HttpStatus.CREATED);
         } else {
-            return new ResponseEntity(HttpStatus.BAD_REQUEST); //   CORRECT RESPONSE STATUS?
-
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST); //   CORRECT RESPONSE STATUS?
         }
     }
 
     /**
-     * Retrieves a new Sequence [R].
+     * Retrieves all Sequences [R].
+     * @return
+     */
+    @GetMapping( { "" } )
+    public ResponseEntity<List<SequenceRec>> retrieveSequences ( ) {
+
+        List<SequenceRec> sequences = sequenceService.retrieveSequences ( );
+
+        if ( !sequences.isEmpty ( ) ) {
+            return new ResponseEntity<> ( sequences, HttpStatus.OK );
+
+        } else {
+            return new ResponseEntity<> ( HttpStatus.NOT_FOUND );
+        }
+    }
+
+    /**
+     * Retrieves a Sequence [R].
      * @return
      */
     @GetMapping( { "/{sequenceId}" } )
@@ -88,10 +105,10 @@ public class SequenceRestController {
         SequenceRec sequence = sequenceService.retrieveSequence ( sequenceId );
 
         if ( sequence != null  ) {
-            return new ResponseEntity ( sequence, HttpStatus.OK );
+            return new ResponseEntity<> ( sequence, HttpStatus.OK );
 
         } else {
-            return new ResponseEntity ( HttpStatus.NOT_FOUND ); //   CORRECT RESPONSE STATUS?
+            return new ResponseEntity<> ( HttpStatus.NOT_FOUND ); //   CORRECT RESPONSE STATUS?
 
         }
 
@@ -102,7 +119,10 @@ public class SequenceRestController {
      * @return
      */
     @PutMapping( { "/{sequenceId}" } )
-    public ResponseEntity<Void> updateSequence ( @PathVariable ( "sequenceId" ) String sequenceId, @RequestBody SequenceRec sequence ) {
+    public ResponseEntity<Void> updateSequence ( @PathVariable ( "sequenceId" ) String sequenceId, @RequestBody SequenceDTO sequenceDTO ) {
+
+        SequenceMapper sequenceMapper = new SequenceMapper ( );
+        SequenceRec sequence = sequenceMapper.toSequence ( sequenceDTO );
 
         String updatedSequenceId = sequenceService.updateSequence ( sequenceId, sequence );
 
@@ -110,10 +130,10 @@ public class SequenceRestController {
             HttpHeaders headers = new HttpHeaders ( );
             headers.add("Location", updatedSequenceId );
 
-            return new ResponseEntity ( HttpStatus.NO_CONTENT );
+            return new ResponseEntity<> ( HttpStatus.NO_CONTENT );
 
         } else {
-            return new ResponseEntity ( HttpStatus.BAD_REQUEST ); //   CORRECT RESPONSE STATUS?
+            return new ResponseEntity<> ( HttpStatus.BAD_REQUEST ); //   CORRECT RESPONSE STATUS?
 
         }
 
@@ -132,10 +152,10 @@ public class SequenceRestController {
             HttpHeaders headers = new HttpHeaders();
             headers.add("X-Deleted", deletedSequenceId);
 
-            return new ResponseEntity ( HttpStatus.NO_CONTENT );
+            return new ResponseEntity<> ( HttpStatus.NO_CONTENT );
 
         } else {
-            return new ResponseEntity ( HttpStatus.NOT_FOUND ); //   CORRECT RESPONSE STATUS?
+            return new ResponseEntity<> ( HttpStatus.NOT_FOUND ); //   CORRECT RESPONSE STATUS?
 
         }
 
@@ -152,10 +172,10 @@ public class SequenceRestController {
 
         if ( generatedElement != null  ) {
 
-            return new ResponseEntity ( generatedElement, HttpStatus.OK );
+            return new ResponseEntity<> ( generatedElement, HttpStatus.OK );
 
         } else {
-            return new ResponseEntity ( HttpStatus.NOT_FOUND ); //   CORRECT RESPONSE STATUS?
+            return new ResponseEntity<> ( HttpStatus.NOT_FOUND ); //   CORRECT RESPONSE STATUS?
 
         }
 
@@ -172,10 +192,10 @@ public class SequenceRestController {
 
         if ( generatedElements != null  ) {
 
-            return new ResponseEntity ( generatedElements, HttpStatus.OK );
+            return new ResponseEntity<> ( generatedElements, HttpStatus.OK );
 
         } else {
-            return new ResponseEntity ( HttpStatus.NOT_FOUND ); //   CORRECT RESPONSE STATUS?
+            return new ResponseEntity<> ( HttpStatus.NOT_FOUND ); //   CORRECT RESPONSE STATUS?
 
         }
 

@@ -1,8 +1,6 @@
 package info.pmarquezh.junjo.repository;
 
 //   Third party Imports
-import org.springframework.context.annotation.Configuration;
-import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

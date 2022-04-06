@@ -4,7 +4,7 @@ junjo: "sequence" in Japanese, is a microservice that returns the next code in, 
 ## Requirements
 * JBoss Undertow 2.2.14.Final or newer
 * MongoDB 4.0.9 or newer
-* Spring Boot 2.6.3
+* Spring Boot 2.6.6
 * Java 17
 
 ## Issues
@@ -16,7 +16,12 @@ junjo: "sequence" in Japanese, is a microservice that returns the next code in, 
 ## junjo Docker Repo
 [docker pull pmarquezh/junjo](https://hub.docker.com/r/pmarquezh/junjo)
 
-## Release Notes
+## Release Notes### v0.8.5
+* Added GET /junjoAPI/1.0/sequences.
+* Added a SequenceDTO to info-receiving endpoints to improve security.
+* Fixed all SonarLint observations.
+* Updated Spring Boot to 2.6.6.
+* Ran SNYK for vulnerabilities. Fixes.
 
 ### v0.8.0
 * Added YEAR pattern as LONG_YEAR "{YYYY}" or SHORT_YEAR "{YY}". the value defaults to the current year. If a year pattern does not comply with the expected format, it defaults to the LONG-YEAR "{YYYY}"
