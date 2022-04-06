@@ -4,7 +4,6 @@ package info.pmarquezh.junjo.mapper;
 
 //   Third Party Libraries Imports
 import lombok.extern.java.Log;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -41,7 +40,6 @@ import info.pmarquezh.junjo.model.sequence.SequenceDTO;
 @Log
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 @Builder
 @Component
 public class SequenceMapper {
