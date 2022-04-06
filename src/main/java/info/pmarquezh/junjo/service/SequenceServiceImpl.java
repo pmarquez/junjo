@@ -90,6 +90,23 @@ public class SequenceServiceImpl implements SequenceService {
     }
 
     /**
+     * Retrieves all sequences in storage [R]
+     *
+     * @return
+     */
+    @Override
+    public List<SequenceRec> retrieveSequences ( ) {
+
+        Iterable<SequenceRec> iSequences = sequenceRepository.findAll ( );
+
+        List<SequenceRec> sequences = new ArrayList<> ( );
+
+        iSequences.forEach ( sequences::add );
+
+        return sequences;
+    }
+
+    /**
      * Retrieves a sequence by ID [R]
      * @param sequenceId
      * @return
@@ -111,7 +128,7 @@ public class SequenceServiceImpl implements SequenceService {
      * @return SequenceRec The sequence record to update.
      */
     @Override
-    public String updateSequence(String sequenceId, SequenceRec sequence) {
+    public String updateSequence ( String sequenceId, SequenceRec sequence ) {
 
         SequenceRec dbSequence = this.retrieveSequence ( sequenceId );
 

@@ -44,6 +44,12 @@ public interface SequenceService {
     String persistSequence(SequenceRec sequence);
 
     /**
+     * Retrieves all sequences in storage [R]
+     * @return
+     */
+    List<SequenceRec> retrieveSequences ( );
+
+    /**
      * Retrieves a sequence by Id [R]
      * @param sequenceId
      * @return SequenceRec The requested sequence record or null if not found.
@@ -78,4 +84,5 @@ public interface SequenceService {
      * @return List<String></String> The list of generated elements from a sequence or null (if sequenceId is not valid/found).
      */
     List<String> getNextElementsInSequence ( String sequenceId, int quantity );
+
 }
