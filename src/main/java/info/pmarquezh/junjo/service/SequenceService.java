@@ -1,16 +1,15 @@
 package info.pmarquezh.junjo.service;
 
 //   Standard Libraries Imports
+import java.util.List;
 
 //   Third Party Libraries Imports
 
 //   FENIX Framework Imports
 
 //   Domain Imports
-
+import info.pmarquezh.junjo.model.sequence.SequenceDTO;
 import info.pmarquezh.junjo.model.sequence.SequenceRec;
-
-import java.util.List;
 
 /**
  * SequenceService.java<br><br>
@@ -38,10 +37,10 @@ public interface SequenceService {
 
     /**
      * Persists a new Sequence [C].
-     * @param sequence
+     * @param sequenceDTO
      * @return
      */
-    String persistSequence(SequenceRec sequence);
+    String persistSequence ( SequenceDTO sequenceDTO );
 
     /**
      * Retrieves all sequences in storage [R]
@@ -61,7 +60,7 @@ public interface SequenceService {
      * @param sequenceId
      * @return SequenceRec The sequence record to update.
      */
-    String updateSequence ( String sequenceId, SequenceRec sequence );
+    int updateSequence ( String sequenceId, SequenceDTO sequenceDTO );
 
     /**
      * Deletes a sequence [D]

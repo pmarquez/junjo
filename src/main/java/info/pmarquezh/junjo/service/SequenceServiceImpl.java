@@ -21,6 +21,8 @@ import org.springframework.stereotype.Service;
 //   Domain Imports
 import info.pmarquezh.junjo.model.sequence.SequenceRec;
 import info.pmarquezh.junjo.repository.SequenceRepository;
+import info.pmarquezh.junjo.mapper.SequenceMapper;
+import info.pmarquezh.junjo.model.sequence.SequenceDTO;
 
 /**
  * SequenceServiceImpl.java<br><br>
@@ -69,21 +71,32 @@ public class SequenceServiceImpl implements SequenceService {
     /**
      * Persists a new Sequence [C].
      *
-     * @param sequence
+     * @param sequenceDTO
      * @return
      */
     @Override
-    public String persistSequence(SequenceRec sequence) {
+    public String persistSequence ( SequenceDTO sequenceDTO ) {
 
-        SequenceRec newSequence = SequenceRec.builder ( ).id ( UUID.randomUUID ( ).toString ( ) )
-                                                         .sequenceName ( sequence.getSequenceName ( ) )
-                                                         .pattern( sequence.getPattern( ) )
-                                                         .currentNumericSequence ( sequence.getCurrentNumericSequence ( ) )
-                                                         .currentAlphaSequence ( sequence.getCurrentAlphaSequence ( ) )
-                                                         .priorityType ( sequence.getPriorityType ( ) )
-                                                         .build ( );
+        SequenceMapper sequenceMapper = new SequenceMapper ( );
+        SequenceRec sequence = sequenceMapper.toSequence ( sequenceDTO );
 
-        sequenceRepository.save ( newSequence );
+        SequenceRec newSequence;
+
+        if ( sequence.getPattern ( ) == null ) {
+            newSequence = SequenceRec.builder ( ).id ( "" ).build ( );
+
+        } else {
+            newSequence = SequenceRec.builder ( ).id ( UUID.randomUUID ( ).toString ( ) )
+                    .sequenceName ( sequence.getSequenceName ( ) )
+                    .pattern( sequence.getPattern ( ) )
+                    .currentNumericSequence ( sequence.getCurrentNumericSequence ( ) )
+                    .currentAlphaSequence ( sequence.getCurrentAlphaSequence ( ) )
+                    .priorityType ( sequence.getPriorityType ( ) )
+                    .build ( );
+
+            sequenceRepository.save ( newSequence );
+
+        }
 
         return newSequence.getId ( );
 
@@ -114,6 +127,8 @@ public class SequenceServiceImpl implements SequenceService {
     @Override
     public SequenceRec retrieveSequence ( String sequenceId ) {
 
+        if ( !validateUUID ( sequenceId ) ) { return null; }
+
         Optional<SequenceRec> sequenceWrapper = sequenceRepository.findById ( sequenceId );
 
         return ( sequenceWrapper.isPresent ( ) ) ? sequenceWrapper.get ( ) : null;
@@ -124,29 +139,34 @@ public class SequenceServiceImpl implements SequenceService {
      * Updates a sequence [U]
      *
      * @param sequenceId
-     * @param sequence
+     * @param sequenceDTO
      * @return SequenceRec The sequence record to update.
      */
     @Override
-    public String updateSequence ( String sequenceId, SequenceRec sequence ) {
+    public int updateSequence ( String sequenceId, SequenceDTO sequenceDTO ) {
 
-        SequenceRec dbSequence = this.retrieveSequence ( sequenceId );
+        SequenceMapper sequenceMapper = new SequenceMapper ( );
+        SequenceRec sequence = sequenceMapper.toSequence ( sequenceDTO );
 
-        if ( dbSequence != null ) {
-
-            dbSequence.setSequenceName ( sequence.getSequenceName ( ) );
-            dbSequence.setPattern( sequence.getPattern( ) );
-            dbSequence.setCurrentAlphaSequence ( sequence.getCurrentAlphaSequence ( ) );
-            dbSequence.setCurrentNumericSequence ( sequence.getCurrentNumericSequence ( ) );
-            dbSequence.setPriorityType ( sequence.getPriorityType ( ) );
-
-            sequenceRepository.save ( dbSequence );
-
-            return dbSequence.getId ( );
-
+        if ( sequence.getPattern ( ) == null ) {
+            return 400; //   BAD_REQUEST
         } else {
-            return null;
+            SequenceRec dbSequence = this.retrieveSequence ( sequenceId );
 
+            if ( dbSequence != null ) {
+                dbSequence.setSequenceName ( sequence.getSequenceName ( ) );
+                dbSequence.setPattern( sequence.getPattern( ) );
+                dbSequence.setCurrentAlphaSequence ( sequence.getCurrentAlphaSequence ( ) );
+                dbSequence.setCurrentNumericSequence ( sequence.getCurrentNumericSequence ( ) );
+                dbSequence.setPriorityType ( sequence.getPriorityType ( ) );
+
+                sequenceRepository.save ( dbSequence );
+
+                return 204;   //   NO_CONTENT
+
+            } else {
+                return 404;   //   NOT_FOUND
+            }
         }
     }
 
@@ -194,6 +214,8 @@ public class SequenceServiceImpl implements SequenceService {
     public String getNextInSequence ( String sequenceId ) {
 
         sequence = this.retrieveSequence ( sequenceId );
+        if ( sequence == null ) {  return null; }
+
         template = sequence.getPattern( );
 
         //   YEAR PATTERN
@@ -211,6 +233,7 @@ public class SequenceServiceImpl implements SequenceService {
         sequenceRepository.save ( sequence );
 
         return template;
+
     }
 
     /**
@@ -224,6 +247,7 @@ public class SequenceServiceImpl implements SequenceService {
     public List<String> getNextElementsInSequence ( String sequenceId, int quantity ) {
 
         sequence = this.retrieveSequence ( sequenceId );
+        if ( sequence == null ) {  return null; }
 
         List<String> elements = new ArrayList<> ( );
 
@@ -412,6 +436,33 @@ public class SequenceServiceImpl implements SequenceService {
      */
     private String transformSequenceToRepresentation ( int alphaSequence ) {
         return alphaSequence < 0 ? BLANK : transformSequenceToRepresentation (( alphaSequence / NUM_CHARS_FROM_A_TO_Z ) - NUMBER_ONE ) + ( char ) ( CHAR_FOR_A + alphaSequence % NUM_CHARS_FROM_A_TO_Z );
+    }
+
+    /****************************************************************************/
+    /*****VALIDATIONS************************************************************/
+    /****************************************************************************/
+
+    /**
+     * Validates a UUID is correctly formed.
+     * @param theUuid
+     * @return
+     */
+    private boolean validateUUID ( String theUuid ) {
+
+        boolean validUuid = true;
+
+        try{
+            UUID uuid = UUID.fromString ( theUuid );
+            log.info ( "well formed sequenceID" );
+            log.info ( "Variant:" + uuid.variant ( ) );
+            log.info ( "Variant:" + uuid.version ( ) );
+
+        } catch (IllegalArgumentException exception){
+            validUuid = false;
+        }
+
+        return validUuid;
+
     }
 
 }

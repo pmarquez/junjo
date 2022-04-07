@@ -11,13 +11,20 @@ junjo: "sequence" in Japanese, is a microservice that returns the next code in, 
 [GitHub Issue Tracker](https://github.com/pmarquez/junjo/issues)
 
 ## junjo OpenAPI Doc
-[OpenAPI Doc] (https://github.com/pmarquez/junjo/blob/main/junjoAPI.yaml)
+[OpenAPI Doc](https://github.com/pmarquez/junjo/blob/main/junjoAPI.yaml)
 
 ## junjo Docker Repo
 [docker pull pmarquezh/junjo](https://hub.docker.com/r/pmarquezh/junjo)
 
-## Release Notes### v0.8.5
-* Added GET /junjoAPI/1.0/sequences.
+## Release Notes
+
+### v0.9.0
+* Moved the DTO mapping to the service layer.
+* Added the first validation (sequencePattern != null) (SHAME ON ME TO BE DOING IT SO LATE).
+* Controllers now respond with a **Message** header with an information about the status (WIP).
+
+### v0.8.5
+* Added **GET** */junjoAPI/1.0/sequences*
 * Added a SequenceDTO to info-receiving endpoints to improve security.
 * Fixed all SonarLint observations.
 * Updated Spring Boot to 2.6.6.
@@ -30,7 +37,7 @@ junjo: "sequence" in Japanese, is a microservice that returns the next code in, 
 * MongoDB collection now is named "sequences".
 
 ### v0.7.0
-* Retrieve a series of elements /junjoAPI/1.0/sequences/generate/:sequenceId/:quantity.
+* Retrieve a series of elements **GET** */junjoAPI/1.0/sequences/generate/:sequenceId/:quantity*
 
 ### v0.6.1
 * code refactoring, better structure.
@@ -39,16 +46,16 @@ junjo: "sequence" in Japanese, is a microservice that returns the next code in, 
 * "priorityType": "numeric" (pending thorough testing) working as expected.
 
 ### v0.5.0
-* Added GET /junjoAPI/1.0/sequences/generate/:sequenceId
+* Added **GET* */junjoAPI/1.0/sequences/generate/:sequenceId*
 
 ### v0.4.0
-* Added UPDATE /junjoAPI/1.0/sequences/:sequenceId
+* Added **UPDATE** */junjoAPI/1.0/sequences/:sequenceId*
 
 ### v0.3.0
-* Added DELETE /junjoAPI/1.0/sequences/:sequenceId
+* Added **DELETE** */junjoAPI/1.0/sequences/:sequenceId*
 
 ### v0.2.0
-* Added GET    /junjoAPI/1.0/sequences/:sequenceId
+* Added **GET** */junjoAPI/1.0/sequences/:sequenceId*
 
 ### v0.1.0
-* Added POST   /junjoAPI/1.0/sequences
+* Added **POST** */junjoAPI/1.0/sequences*
