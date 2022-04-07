@@ -88,8 +88,11 @@ public class SequenceRestController {
 
         if ( !sequences.isEmpty ( ) ) {
             return new ResponseEntity<> ( sequences, HttpStatus.OK );
+
         } else {
-            return new ResponseEntity<> ( HttpStatus.NOT_FOUND );
+            HttpHeaders headers = new HttpHeaders ( );
+                        headers.add("Message", "There are no sequences to retrieve." );
+            return new ResponseEntity<> ( headers, HttpStatus.NOT_FOUND );
         }
 
     }
@@ -106,7 +109,9 @@ public class SequenceRestController {
         if ( sequence != null  ) {
             return new ResponseEntity<> ( sequence, HttpStatus.OK );
         } else {
-            return new ResponseEntity<> ( HttpStatus.NOT_FOUND );
+            HttpHeaders headers = new HttpHeaders ( );
+                        headers.add("Message", "Sequence not found." );
+            return new ResponseEntity<> ( headers, HttpStatus.NOT_FOUND );
         }
 
     }
@@ -156,10 +161,10 @@ public class SequenceRestController {
         if ( deletedSequenceId != null  ) {
             headers.add("Deleted", deletedSequenceId );
             headers.add("Message", "Sequence successfully deleted." );
-
             return new ResponseEntity<> ( headers, HttpStatus.NO_CONTENT );
 
         } else {
+            headers.add("Message", "Sequence not found." );
             return new ResponseEntity<> ( headers, HttpStatus.NOT_FOUND ); //   CORRECT RESPONSE STATUS?
 
         }
@@ -180,10 +185,11 @@ public class SequenceRestController {
             return new ResponseEntity<> ( generatedElement, HttpStatus.OK );
 
         } else {
-            return new ResponseEntity<> ( HttpStatus.NOT_FOUND );
+            HttpHeaders headers = new HttpHeaders ( );
+                        headers.add("Message", "Requested sequence not found." );
+            return new ResponseEntity<> ( headers, HttpStatus.NOT_FOUND );
 
         }
-
     }
 
     /**
@@ -200,7 +206,9 @@ public class SequenceRestController {
             return new ResponseEntity<> ( generatedElements, HttpStatus.OK );
 
         } else {
-            return new ResponseEntity<> ( HttpStatus.NOT_FOUND );
+            HttpHeaders headers = new HttpHeaders ( );
+                        headers.add("Message", "Requested sequence not found." );
+            return new ResponseEntity<> ( headers, HttpStatus.NOT_FOUND );
 
         }
 
