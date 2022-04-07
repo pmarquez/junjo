@@ -23,6 +23,12 @@ paths:
       responses:
         '201':
           description: Created
+          headers:
+            Location:
+              schema:
+                type: string
+                format: uuid
+              description: Location of the newly created resource
         '400':
           description: Bad Request
       description: Creates a new sequence in storage.
@@ -31,6 +37,15 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/SequenceRec'
+            examples:
+              example-1:
+                value:
+                  sequenceName: SKUs
+                  format: '{AAA}-{NNNN}'
+                  currentNumericSequence: 0
+                  currentAlphaSequence: 0
+                  currentAlphaRepresentation: AAA
+                  priorityType: numeric
         description: SequenceRec with the initial data.
     parameters: []
     get:
@@ -39,8 +54,20 @@ paths:
       responses:
         '200':
           description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SequenceRec'
         '404':
           description: Nothing Found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SequenceRec'
       description: Retrieves all sequence definitions in storage.
   '/junjoAPI/1.0/sequences/{sequenceId}':
     parameters:
@@ -60,6 +87,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SequenceRec'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/SequenceRec'
         '404':
           description: Not Found
       description: Retrieves the SequenceRec identified by sequenceId
@@ -72,6 +102,13 @@ paths:
         '404':
           description: Not Found
       description: Deletes a record identified by sequenceId
+      parameters:
+        - schema:
+            type: string
+            format: uuid
+          in: query
+          name: sequenceId
+          description: The ID of the sequence to delete
     put:
       summary: ''
       operationId: put-1.0-sequences-sequenceId
@@ -86,7 +123,27 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/SequenceRec'
+          application/xml:
+            schema:
+              type: object
+              properties: {}
+          multipart/form-data:
+            schema:
+              type: object
+              properties: {}
+          text/html:
+            schema:
+              type: object
+              properties: {}
         description: Data to update the record identified by the parameter "sequenceId"
+      parameters:
+        - schema:
+            type: string
+            format: uuid
+          in: query
+          name: sequenceId
+          description: The ID of the sequence to update
+          required: true
   '/junjoAPI/1.0/sequences/generate/{sequenceId}':
     parameters:
       - schema:
@@ -105,10 +162,19 @@ paths:
             application/json:
               schema:
                 type: string
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/SequenceRec'
         '404':
           description: Not Found
       operationId: get-1.0-sequences-generate-sequenceId
       description: Generates and returns a String containing the next element in the sequence represented by sequenceId.
+      parameters:
+        - schema:
+            type: string
+          in: query
+          name: sequenceId
+          description: The Id of the sequence to retrieve
   '/junjoAPI/1.0/sequences/generate/{sequenceId}/{quantity}':
     parameters:
       - schema:

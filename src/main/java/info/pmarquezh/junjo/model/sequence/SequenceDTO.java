@@ -9,6 +9,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+
 //   ns Framework Imports
 
 //   Domain Imports
@@ -43,10 +46,13 @@ import lombok.NoArgsConstructor;
 @Builder
 public class SequenceDTO {
     String id;
+    @NotBlank ( message = "Sequence name is mandatory" )
     String sequenceName;
+    @NotBlank ( message = "Sequence pattern is mandatory" )
     String pattern;
     int    currentNumericSequence;
     int    currentAlphaSequence;
     String currentAlphaRepresentation;
+    @NotBlank ( message = "Priority Type is mandatory" )
     String priorityType;
 }

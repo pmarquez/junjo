@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 //   Domain Imports
 import info.pmarquezh.junjo.model.sequence.SequenceRec;
 import info.pmarquezh.junjo.service.SequenceService;
-import info.pmarquezh.junjo.mapper.SequenceMapper;
 import info.pmarquezh.junjo.model.sequence.SequenceDTO;
 
 /**
@@ -64,18 +63,18 @@ public class SequenceRestController {
     @PostMapping( { "" } )
     public ResponseEntity<Void> persistSequence ( @RequestBody SequenceDTO sequenceDTO ) {
 
-        SequenceMapper sequenceMapper = new SequenceMapper ( );
-        SequenceRec sequence = sequenceMapper.toSequence ( sequenceDTO );
+        String newSequenceId = sequenceService.persistSequence ( sequenceDTO );
+        HttpHeaders headers = new HttpHeaders ( );
 
-        String newSequenceId = sequenceService.persistSequence ( sequence );
-
-        if (!newSequenceId.equals("")) {
-            HttpHeaders headers = new HttpHeaders();
-            headers.add("Location", newSequenceId);
-            return new ResponseEntity<>(headers, HttpStatus.CREATED);
+        if ( !newSequenceId.equals( "" ) ) {
+            headers.add ( "Location", newSequenceId );
+            headers.add ( "Message", "Sequence created successfully." );
+            return new ResponseEntity<> ( headers, HttpStatus.CREATED );
         } else {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST); //   CORRECT RESPONSE STATUS?
+            headers.add ( "Message", "Sequence pattern is a required value." );
+            return new ResponseEntity<> ( headers, HttpStatus.BAD_REQUEST );
         }
+
     }
 
     /**
@@ -91,8 +90,11 @@ public class SequenceRestController {
             return new ResponseEntity<> ( sequences, HttpStatus.OK );
 
         } else {
-            return new ResponseEntity<> ( HttpStatus.NOT_FOUND );
+            HttpHeaders headers = new HttpHeaders ( );
+                        headers.add("Message", "There are no sequences to retrieve." );
+            return new ResponseEntity<> ( headers, HttpStatus.NOT_FOUND );
         }
+
     }
 
     /**
@@ -106,10 +108,10 @@ public class SequenceRestController {
 
         if ( sequence != null  ) {
             return new ResponseEntity<> ( sequence, HttpStatus.OK );
-
         } else {
-            return new ResponseEntity<> ( HttpStatus.NOT_FOUND ); //   CORRECT RESPONSE STATUS?
-
+            HttpHeaders headers = new HttpHeaders ( );
+                        headers.add("Message", "Sequence not found." );
+            return new ResponseEntity<> ( headers, HttpStatus.NOT_FOUND );
         }
 
     }
@@ -121,20 +123,26 @@ public class SequenceRestController {
     @PutMapping( { "/{sequenceId}" } )
     public ResponseEntity<Void> updateSequence ( @PathVariable ( "sequenceId" ) String sequenceId, @RequestBody SequenceDTO sequenceDTO ) {
 
-        SequenceMapper sequenceMapper = new SequenceMapper ( );
-        SequenceRec sequence = sequenceMapper.toSequence ( sequenceDTO );
+        int updateStatus = sequenceService.updateSequence ( sequenceId, sequenceDTO );
 
-        String updatedSequenceId = sequenceService.updateSequence ( sequenceId, sequence );
+        HttpHeaders headers = new HttpHeaders ( );
 
-        if ( updatedSequenceId != null  ) {
-            HttpHeaders headers = new HttpHeaders ( );
-            headers.add("Location", updatedSequenceId );
+        switch ( updateStatus ) {
+            case 204:
+                headers.add("Message", "Sequence successfully updated." );
+                return new ResponseEntity<> ( headers, HttpStatus.NO_CONTENT );
 
-            return new ResponseEntity<> ( HttpStatus.NO_CONTENT );
+            case 400:
+                headers.add("Message", "Sequence pattern is a required value." );
+                return new ResponseEntity<> ( headers, HttpStatus.BAD_REQUEST );
 
-        } else {
-            return new ResponseEntity<> ( HttpStatus.BAD_REQUEST ); //   CORRECT RESPONSE STATUS?
+            case 404:
+                headers.add("Message", "Sequence not found." );
+                return new ResponseEntity<> ( headers, HttpStatus.NOT_FOUND );
 
+            default:
+                headers.add("Message", "WTF?." );
+                return new ResponseEntity<> ( headers, HttpStatus.I_AM_A_TEAPOT );
         }
 
     }
@@ -148,14 +156,16 @@ public class SequenceRestController {
 
         String deletedSequenceId = sequenceService.deleteSequence ( sequenceId );
 
-        if ( deletedSequenceId != null  ) {
-            HttpHeaders headers = new HttpHeaders();
-            headers.add("X-Deleted", deletedSequenceId);
+        HttpHeaders headers = new HttpHeaders();
 
-            return new ResponseEntity<> ( HttpStatus.NO_CONTENT );
+        if ( deletedSequenceId != null  ) {
+            headers.add("Deleted", deletedSequenceId );
+            headers.add("Message", "Sequence successfully deleted." );
+            return new ResponseEntity<> ( headers, HttpStatus.NO_CONTENT );
 
         } else {
-            return new ResponseEntity<> ( HttpStatus.NOT_FOUND ); //   CORRECT RESPONSE STATUS?
+            headers.add("Message", "Sequence not found." );
+            return new ResponseEntity<> ( headers, HttpStatus.NOT_FOUND ); //   CORRECT RESPONSE STATUS?
 
         }
 
@@ -175,10 +185,11 @@ public class SequenceRestController {
             return new ResponseEntity<> ( generatedElement, HttpStatus.OK );
 
         } else {
-            return new ResponseEntity<> ( HttpStatus.NOT_FOUND ); //   CORRECT RESPONSE STATUS?
+            HttpHeaders headers = new HttpHeaders ( );
+                        headers.add("Message", "Requested sequence not found." );
+            return new ResponseEntity<> ( headers, HttpStatus.NOT_FOUND );
 
         }
-
     }
 
     /**
@@ -195,7 +206,9 @@ public class SequenceRestController {
             return new ResponseEntity<> ( generatedElements, HttpStatus.OK );
 
         } else {
-            return new ResponseEntity<> ( HttpStatus.NOT_FOUND ); //   CORRECT RESPONSE STATUS?
+            HttpHeaders headers = new HttpHeaders ( );
+                        headers.add("Message", "Requested sequence not found." );
+            return new ResponseEntity<> ( headers, HttpStatus.NOT_FOUND );
 
         }
 
