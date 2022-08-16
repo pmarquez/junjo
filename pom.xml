@@ -10,9 +10,9 @@
 	</parent>
 	<groupId>info.pmarquezh</groupId>
 	<artifactId>junjo</artifactId>
-	<version>0.9.1</version>
+	<version>0.9.2</version>
 	<name>junjo</name>
-	<description>Junjo, &quot;sequence&quot; in Japanese, is a microservice that returns the next code in, well, a sequence or series.</description>
+	<description>Junjo, &quot;sequence&quot; in Japanese, is a microservice that returns the next element in, well, a sequence or series.</description>
 
 	<developers>
 		<developer>

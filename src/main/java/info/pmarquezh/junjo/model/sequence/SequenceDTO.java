@@ -1,6 +1,8 @@
 package info.pmarquezh.junjo.model.sequence;
 
 //   Standard Libraries Imports
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 
 //   Third Party Libraries Imports
 import lombok.extern.java.Log;
@@ -8,9 +10,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
 
 //   ns Framework Imports
 
@@ -45,14 +44,16 @@ import javax.validation.constraints.NotBlank;
 @AllArgsConstructor
 @Builder
 public class SequenceDTO {
-    String id;
+//    String id;
     @NotBlank ( message = "Sequence name is mandatory" )
     String sequenceName;
     @NotBlank ( message = "Sequence pattern is mandatory" )
     String pattern;
-    int    currentNumericSequence;
-    int    currentAlphaSequence;
-    String currentAlphaRepresentation;
+    @Min( value = 0, message="Value cannot be lesser than 0" )
+    int    currentNumericSequence = 0;
+    @Min( value = 0, message="Value cannot be lesser than 0" )
+    int    currentAlphaSequence   = 0;
+    String currentAlphaRepresentation = "";
     @NotBlank ( message = "Priority Type is mandatory" )
     String priorityType;
 }
