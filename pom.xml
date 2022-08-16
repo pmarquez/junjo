@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>info.pmarquezh</groupId>
 	<artifactId>junjo</artifactId>
-	<version>0.9.3</version>
+	<version>0.9.4</version>
 	<name>junjo</name>
 	<description>Junjo, &quot;sequence&quot; in Japanese, is a microservice that returns the next element in, well, a sequence or series.</description>
 
@@ -20,7 +20,7 @@
 			<name>Paulo Márquez-Herrero</name>
 			<email>me@pmarquezh.info</email>
 			<url>http://pmarquezh.info</url>
-			<organization></organization>
+			<organization>Paulo Márquez Herrero</organization>
 			<organizationUrl>http://pmarquezh.info</organizationUrl>
 			<roles>
 				<role>architect</role>
@@ -72,7 +72,6 @@
 		</dependencies>
 	</dependencyManagement>
 <!-- OpenTelemetry - Sleuth-->
-
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -88,7 +87,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-undertow</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
@@ -143,7 +141,17 @@
 					<groupId>org.springframework.cloud</groupId>
 					<artifactId>spring-cloud-sleuth-brave</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>org.bouncycastle</groupId>
+					<artifactId>bcprov-jdk15on</artifactId>
+				</exclusion>
 			</exclusions>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk15on -->
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcprov-jdk15on</artifactId>
+			<version>1.70</version>
 		</dependency>
 		<!-- Add OpenTelemetry tracer -->
 		<dependency>

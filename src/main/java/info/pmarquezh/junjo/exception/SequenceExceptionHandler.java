@@ -1,7 +1,10 @@
 package info.pmarquezh.junjo.exception;
 
 //   Standard Libraries Imports
+import java.time.LocalDate;
+import java.util.List;
 
+//   Third Party Imports
 import lombok.extern.java.Log;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -11,10 +14,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-
-import java.time.LocalDate;
-import java.util.List;
-import java.util.stream.Collectors;
 
 //   ns Framework Imports
 
@@ -47,23 +46,30 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class SequenceExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(Exception.class)
-    public ErrorDetails handleExceptions(Exception ex, WebRequest request) {
-        ErrorDetails errorDetails = new ErrorDetails ( LocalDate.now ( ), ex.getMessage ( ), "Exception" );
-        return errorDetails;
+    @ExceptionHandler ( Exception.class )
+    public ErrorDetails handleExceptions ( Exception ex, WebRequest request ) {
+        return new ErrorDetails ( LocalDate.now ( ), ex.getMessage ( ), "Exception" );
     }
 
+    /**
+     *
+     * @param ex The Exception
+     * @param headers Request Headers
+     * @param status Http Status
+     * @param request Http Request
+     * @return A ResponseEntity with all filled in values.
+     */
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid ( MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request ) {
 
         List<ErrorMessageDto> validationErrorDetails = ex.getBindingResult ( )
-                .getFieldErrors()
-                .stream()
-                .map(error -> new ErrorMessageDto(error.getObjectName(),error.getField(),error.getDefaultMessage(),error.getRejectedValue().toString()))
-                .collect(Collectors.toList());
+                                                         .getFieldErrors ( )
+                                                         .stream ( )
+                                                         .map ( error -> new ErrorMessageDto ( error.getObjectName ( ), error.getField ( ), error.getDefaultMessage ( ), error.getRejectedValue ( ).toString ( ) ) )
+                                                         .toList ( );
 
-        ErrorResponse response = new ErrorResponse(status.name(), status.value(),validationErrorDetails);
-        return new ResponseEntity<>(response,status );
+        ErrorResponse response = new ErrorResponse(status.name ( ), status.value ( ), validationErrorDetails );
+        return new ResponseEntity<> ( response,status );
 
     }
 
