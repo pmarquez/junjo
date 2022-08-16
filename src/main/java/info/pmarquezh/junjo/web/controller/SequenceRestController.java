@@ -1,6 +1,7 @@
 package info.pmarquezh.junjo.web.controller;
 
 //   Standard Libraries Imports
+import java.util.ArrayList;
 import java.util.List;
 
 //   Third Party Libraries Imports
@@ -68,11 +69,9 @@ public class SequenceRestController {
 
         if ( !newSequenceId.equals( "" ) ) {
             headers.add ( "Location", newSequenceId );
-            headers.add ( "Message", "Sequence created successfully." );
             return new ResponseEntity<> ( headers, HttpStatus.CREATED );
         } else {
-            headers.add ( "Message", "Sequence pattern is a required value." );
-            return new ResponseEntity<> ( headers, HttpStatus.BAD_REQUEST );
+            return new ResponseEntity<> ( HttpStatus.BAD_REQUEST );
         }
 
     }
@@ -90,9 +89,7 @@ public class SequenceRestController {
             return new ResponseEntity<> ( sequences, HttpStatus.OK );
 
         } else {
-            HttpHeaders headers = new HttpHeaders ( );
-                        headers.add("Message", "There are no sequences to retrieve." );
-            return new ResponseEntity<> ( headers, HttpStatus.NOT_FOUND );
+            return new ResponseEntity<> ( new ArrayList<> ( ), HttpStatus.NOT_FOUND );
         }
 
     }
@@ -109,9 +106,7 @@ public class SequenceRestController {
         if ( sequence != null  ) {
             return new ResponseEntity<> ( sequence, HttpStatus.OK );
         } else {
-            HttpHeaders headers = new HttpHeaders ( );
-                        headers.add("Message", "Sequence not found." );
-            return new ResponseEntity<> ( headers, HttpStatus.NOT_FOUND );
+            return new ResponseEntity<> ( HttpStatus.NOT_FOUND );
         }
 
     }
@@ -125,24 +120,18 @@ public class SequenceRestController {
 
         int updateStatus = sequenceService.updateSequence ( sequenceId, sequenceDTO );
 
-        HttpHeaders headers = new HttpHeaders ( );
-
         switch ( updateStatus ) {
             case 204:
-                headers.add("Message", "Sequence successfully updated." );
-                return new ResponseEntity<> ( headers, HttpStatus.NO_CONTENT );
+                return new ResponseEntity<> ( HttpStatus.NO_CONTENT );
 
             case 400:
-                headers.add("Message", "Sequence pattern is a required value." );
-                return new ResponseEntity<> ( headers, HttpStatus.BAD_REQUEST );
+                return new ResponseEntity<> ( HttpStatus.BAD_REQUEST );
 
             case 404:
-                headers.add("Message", "Sequence not found." );
-                return new ResponseEntity<> ( headers, HttpStatus.NOT_FOUND );
+                return new ResponseEntity<> ( HttpStatus.NOT_FOUND );
 
             default:
-                headers.add("Message", "WTF?." );
-                return new ResponseEntity<> ( headers, HttpStatus.I_AM_A_TEAPOT );
+                return new ResponseEntity<> ( HttpStatus.I_AM_A_TEAPOT );
         }
 
     }
@@ -156,16 +145,11 @@ public class SequenceRestController {
 
         String deletedSequenceId = sequenceService.deleteSequence ( sequenceId );
 
-        HttpHeaders headers = new HttpHeaders();
-
         if ( deletedSequenceId != null  ) {
-            headers.add("Deleted", deletedSequenceId );
-            headers.add("Message", "Sequence successfully deleted." );
-            return new ResponseEntity<> ( headers, HttpStatus.NO_CONTENT );
+            return new ResponseEntity<> ( HttpStatus.NO_CONTENT );
 
         } else {
-            headers.add("Message", "Sequence not found." );
-            return new ResponseEntity<> ( headers, HttpStatus.NOT_FOUND ); //   CORRECT RESPONSE STATUS?
+            return new ResponseEntity<> ( HttpStatus.NOT_FOUND ); //   CORRECT RESPONSE STATUS?
 
         }
 
@@ -180,7 +164,7 @@ public class SequenceRestController {
 
         String generatedElement = sequenceService.getNextInSequence ( sequenceId );
 
-        if ( generatedElement != null  ) {
+        if ( !generatedElement.isEmpty ( ) ) {
 
             return new ResponseEntity<> ( generatedElement, HttpStatus.OK );
 
@@ -201,14 +185,12 @@ public class SequenceRestController {
 
         List<String> generatedElements = sequenceService.getNextElementsInSequence ( sequenceId, quantity );
 
-        if ( generatedElements != null  ) {
+        if ( !generatedElements.isEmpty ( ) ) {
 
             return new ResponseEntity<> ( generatedElements, HttpStatus.OK );
 
         } else {
-            HttpHeaders headers = new HttpHeaders ( );
-                        headers.add("Message", "Requested sequence not found." );
-            return new ResponseEntity<> ( headers, HttpStatus.NOT_FOUND );
+            return new ResponseEntity<> ( new ArrayList<> ( ), HttpStatus.NOT_FOUND );
 
         }
 

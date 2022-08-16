@@ -63,9 +63,12 @@ public class SequenceServiceImpl implements SequenceService {
 
     private SequenceRepository sequenceRepository;
 
+    private SequenceMapper sequenceMapper;
+
     @Autowired
-    public SequenceServiceImpl ( SequenceRepository sequenceRepository ) {
+    public SequenceServiceImpl ( SequenceRepository sequenceRepository, SequenceMapper sequenceMapper ) {
         this.sequenceRepository = sequenceRepository;
+        this.sequenceMapper = sequenceMapper;
     }
 
     /**
@@ -77,22 +80,21 @@ public class SequenceServiceImpl implements SequenceService {
     @Override
     public String persistSequence ( SequenceDTO sequenceDTO ) {
 
-        SequenceMapper sequenceMapper = new SequenceMapper ( );
-        SequenceRec sequence = sequenceMapper.toSequence ( sequenceDTO );
+        SequenceRec seq = sequenceMapper.toSequence ( sequenceDTO );
 
         SequenceRec newSequence;
 
-        if ( sequence.getPattern ( ) == null ) {
+        if ( seq.getPattern ( ) == null ) {
             newSequence = SequenceRec.builder ( ).id ( "" ).build ( );
 
         } else {
             newSequence = SequenceRec.builder ( ).id ( UUID.randomUUID ( ).toString ( ) )
-                    .sequenceName ( sequence.getSequenceName ( ) )
-                    .pattern( sequence.getPattern ( ) )
-                    .currentNumericSequence ( sequence.getCurrentNumericSequence ( ) )
-                    .currentAlphaSequence ( sequence.getCurrentAlphaSequence ( ) )
-                    .priorityType ( sequence.getPriorityType ( ) )
-                    .build ( );
+                                                 .sequenceName ( seq.getSequenceName ( ) )
+                                                 .pattern( seq.getPattern ( ) )
+                                                 .currentNumericSequence ( seq.getCurrentNumericSequence ( ) )
+                                                 .currentAlphaSequence ( seq.getCurrentAlphaSequence ( ) )
+                                                 .priorityType ( seq.getPriorityType ( ) )
+                                                 .build ( );
 
             sequenceRepository.save ( newSequence );
 
@@ -117,6 +119,7 @@ public class SequenceServiceImpl implements SequenceService {
         iSequences.forEach ( sequences::add );
 
         return sequences;
+
     }
 
     /**
@@ -145,20 +148,19 @@ public class SequenceServiceImpl implements SequenceService {
     @Override
     public int updateSequence ( String sequenceId, SequenceDTO sequenceDTO ) {
 
-        SequenceMapper sequenceMapper = new SequenceMapper ( );
-        SequenceRec sequence = sequenceMapper.toSequence ( sequenceDTO );
+        SequenceRec seq = sequenceMapper.toSequence ( sequenceDTO );
 
-        if ( sequence.getPattern ( ) == null ) {
+        if ( seq.getPattern ( ) == null ) {
             return 400; //   BAD_REQUEST
         } else {
             SequenceRec dbSequence = this.retrieveSequence ( sequenceId );
 
             if ( dbSequence != null ) {
-                dbSequence.setSequenceName ( sequence.getSequenceName ( ) );
-                dbSequence.setPattern( sequence.getPattern( ) );
-                dbSequence.setCurrentAlphaSequence ( sequence.getCurrentAlphaSequence ( ) );
-                dbSequence.setCurrentNumericSequence ( sequence.getCurrentNumericSequence ( ) );
-                dbSequence.setPriorityType ( sequence.getPriorityType ( ) );
+                dbSequence.setSequenceName ( seq.getSequenceName ( ) );
+                dbSequence.setPattern( seq.getPattern( ) );
+                dbSequence.setCurrentAlphaSequence ( seq.getCurrentAlphaSequence ( ) );
+                dbSequence.setCurrentNumericSequence ( seq.getCurrentNumericSequence ( ) );
+                dbSequence.setPriorityType ( seq.getPriorityType ( ) );
 
                 sequenceRepository.save ( dbSequence );
 
@@ -214,7 +216,7 @@ public class SequenceServiceImpl implements SequenceService {
     public String getNextInSequence ( String sequenceId ) {
 
         sequence = this.retrieveSequence ( sequenceId );
-        if ( sequence == null ) {  return null; }
+        if ( sequence == null ) {  return ""; }
 
         template = sequence.getPattern( );
 
@@ -247,7 +249,7 @@ public class SequenceServiceImpl implements SequenceService {
     public List<String> getNextElementsInSequence ( String sequenceId, int quantity ) {
 
         sequence = this.retrieveSequence ( sequenceId );
-        if ( sequence == null ) {  return null; }
+        if ( sequence == null ) {  return new ArrayList<> ( ); }
 
         List<String> elements = new ArrayList<> ( );
 

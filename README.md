@@ -65,14 +65,21 @@ docker pull pmarquezh/junjo
 ```
 ## Release Notes
 
+### v0.9.1
+```
+* SequenceMapper usage is now autowired.
+* Status messages NOT passed in the headers anymore. Please implement a correct validation schema.
+```
+
 ### v0.9.0
-```bash
+```
 * Moved the DTO mapping to the service layer.
 * Added the first validation "(sequencePattern != null)" (SHAME ON ME TO BE DOING IT SO LATE).
 * Controllers now respond with a "Message" header with an information about the status (WIP).
 ```
+
 ### v0.8.5
-```bash
+```
 * Added GET /junjoAPI/1.0/sequences
 * Added a SequenceDTO to info-receiving endpoints to improve security.
 * Fixed all SonarLint observations.
