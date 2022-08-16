@@ -120,6 +120,11 @@ docker pull pmarquezh/junjo
 
 ## Release Notes
 
+### v0.9.4
+```
+* 100% of SonarLint issues fixed.
+```
+
 ### v0.9.3
 ```
 * Improved documentation.

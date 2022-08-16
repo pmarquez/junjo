@@ -44,7 +44,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class SequenceDTO {
-//    String id;
     @NotBlank ( message = "Sequence name is mandatory" )
     String sequenceName;
     @NotBlank ( message = "Sequence pattern is mandatory" )
