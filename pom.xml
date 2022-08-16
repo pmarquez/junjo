@@ -39,11 +39,11 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>17</java.version>
-		<spring.boot.version>2.6.7</spring.boot.version>
+		<spring.boot.version>2.7.2</spring.boot.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 <!-- OpenTelemetry - Sleuth-->
-		<spring-cloud.version>2021.0.0-M2</spring-cloud.version>
+		<spring-cloud.version>2021.0.3</spring-cloud.version>
 		<spring-cloud-sleuth-otel.version>1.1.0-M3</spring-cloud-sleuth-otel.version>
 		<opentelemetry-exporter-otlp>1.7.0</opentelemetry-exporter-otlp>
 		<grpc-netty-shaded>1.41.0</grpc-netty-shaded>
