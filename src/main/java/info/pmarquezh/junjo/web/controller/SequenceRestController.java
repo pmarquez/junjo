@@ -19,6 +19,8 @@ import info.pmarquezh.junjo.model.sequence.SequenceRec;
 import info.pmarquezh.junjo.service.SequenceService;
 import info.pmarquezh.junjo.model.sequence.SequenceDTO;
 
+import javax.validation.Valid;
+
 /**
  * SequenceRestController.java<br><br>
  * Creation Date 2022-02-08 16:55<br><br>
@@ -62,7 +64,7 @@ public class SequenceRestController {
      * @return
      */
     @PostMapping( { "" } )
-    public ResponseEntity<Void> persistSequence ( @RequestBody SequenceDTO sequenceDTO ) {
+    public ResponseEntity<Void> persistSequence ( @RequestBody @Valid SequenceDTO sequenceDTO ) {
 
         String newSequenceId = sequenceService.persistSequence ( sequenceDTO );
         HttpHeaders headers = new HttpHeaders ( );
@@ -159,7 +161,7 @@ public class SequenceRestController {
      * Generate next element in the sequence.
      * @return
      */
-    @GetMapping( { "generate/{sequenceId}" } )
+    @GetMapping( { "{sequenceId}/generate" } )
     public ResponseEntity<String> generateNextElementInSequence ( @PathVariable ( "sequenceId" ) String sequenceId ) {
 
         String generatedElement = sequenceService.getNextInSequence ( sequenceId );
@@ -169,9 +171,7 @@ public class SequenceRestController {
             return new ResponseEntity<> ( generatedElement, HttpStatus.OK );
 
         } else {
-            HttpHeaders headers = new HttpHeaders ( );
-                        headers.add("Message", "Requested sequence not found." );
-            return new ResponseEntity<> ( headers, HttpStatus.NOT_FOUND );
+            return new ResponseEntity<> ( HttpStatus.NOT_FOUND );
 
         }
     }
@@ -180,7 +180,7 @@ public class SequenceRestController {
      * Generate next "n" elements in the sequence.
      * @return
      */
-    @GetMapping( { "generate/{sequenceId}/{quantity}" } )
+    @GetMapping( { "{sequenceId}/generate/{quantity}" } )
     public ResponseEntity<List<String>> generateNextElementsInSequence ( @PathVariable ( "sequenceId" ) String sequenceId, @PathVariable ( "quantity" ) int quantity  ) {
 
         List<String> generatedElements = sequenceService.getNextElementsInSequence ( sequenceId, quantity );

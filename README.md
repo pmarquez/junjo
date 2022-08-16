@@ -65,6 +65,11 @@ docker pull pmarquezh/junjo
 ```
 ## Release Notes
 
+### v0.9.2
+```
+* Basic, but correct DTO validation schema in place.
+```
+
 ### v0.9.1
 ```
 * SequenceMapper usage is now autowired.
