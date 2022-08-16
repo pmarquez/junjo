@@ -5,12 +5,12 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.6.7</version>
+		<version>2.7.2</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>info.pmarquezh</groupId>
 	<artifactId>junjo</artifactId>
-	<version>0.8.5</version>
+	<version>0.9.1</version>
 	<name>junjo</name>
 	<description>Junjo, &quot;sequence&quot; in Japanese, is a microservice that returns the next code in, well, a sequence or series.</description>
 
