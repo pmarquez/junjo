@@ -44,15 +44,15 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class SequenceDTO {
-    @NotBlank ( message = "Sequence name is mandatory" )
+    @NotBlank ( message = "{validation.sequenceName}" )
     String sequenceName;
-    @NotBlank ( message = "Sequence pattern is mandatory" )
+    @NotBlank ( message = "{validation.pattern}" )
     String pattern;
-    @Min( value = 0, message="Value cannot be lesser than 0" )
+    @Min( value = 0, message="{validation.currentNumericSequence}" )
     int    currentNumericSequence = 0;
-    @Min( value = 0, message="Value cannot be lesser than 0" )
+    @Min( value = 0, message="{validation.currentAlphaSequence}" )
     int    currentAlphaSequence   = 0;
     String currentAlphaRepresentation = "";
-    @NotBlank ( message = "Priority Type is mandatory" )
+    @NotBlank ( message = "{validation.priorityType}" )
     String priorityType;
 }
