@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.7.2</version>
+		<version>2.7.3</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>info.pmarquezh</groupId>
@@ -39,39 +39,10 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>17</java.version>
-		<spring.boot.version>2.7.2</spring.boot.version>
+		<spring.boot.version>2.7.3</spring.boot.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
-<!-- OpenTelemetry - Sleuth-->
-		<spring-cloud.version>2021.0.3</spring-cloud.version>
-		<spring-cloud-sleuth-otel.version>1.1.0-M3</spring-cloud-sleuth-otel.version>
-		<opentelemetry-exporter-otlp>1.7.0</opentelemetry-exporter-otlp>
-		<grpc-netty-shaded>1.41.0</grpc-netty-shaded>
-<!-- OpenTelemetry - Sleuth-->
 	</properties>
-
-<!-- OpenTelemetry - Sleuth-->
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>org.springframework.cloud</groupId>
-				<artifactId>spring-cloud-dependencies</artifactId>
-				<version>${spring-cloud.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-
-			<!-- Spring Cloud Sleuth OTel requires a Spring Cloud Sleuth OTel BOM -->
-			<dependency>
-				<groupId>org.springframework.cloud</groupId>
-				<artifactId>spring-cloud-sleuth-otel-dependencies</artifactId>
-				<version>${spring-cloud-sleuth-otel.version}</version>
-				<scope>import</scope>
-				<type>pom</type>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
-<!-- OpenTelemetry - Sleuth-->
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -96,6 +67,13 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
+
+		<dependency>
+			<groupId>org.modelmapper</groupId>
+			<artifactId>modelmapper</artifactId>
+			<version>3.1.0</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
@@ -119,85 +97,7 @@
 			<artifactId>commons-lang3</artifactId>
 			<version>3.12.0</version>
 		</dependency>
-<!-- OpenTelemetry - Sleuth-->
-
-<!--
-		Summary:
-
-		Include the Spring Cloud and Spring Cloud Sleuth OTEL BOM as dependency management.
-		Remove the default Brave implementation (no vendor locking).
-		Include the OpenTelemetry library.
-		Include the OpenTelemetry exporter to send the traces and spans to a remote instrumentation backend.
-		Include GRPC Netty Shaded (used by exporter) because there is some disagreement within Spring on providing a default GRPC implementation. See spring-projects-experimental/spring-cloud-sleuth-otel#39
-		Since we are using unreleased versions that are not available in Maven Central, we have to include the Spring Snapshots and Milestone repositories.
--->
-
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-sleuth</artifactId>
-			<exclusions>
-				<!-- Exclude Brave (the default) -->
-				<exclusion>
-					<groupId>org.springframework.cloud</groupId>
-					<artifactId>spring-cloud-sleuth-brave</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.bouncycastle</groupId>
-					<artifactId>bcprov-jdk15on</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk15on -->
-		<dependency>
-			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcprov-jdk15on</artifactId>
-			<version>1.70</version>
-		</dependency>
-		<!-- Add OpenTelemetry tracer -->
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-sleuth-otel-autoconfigure</artifactId>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/io.opentelemetry/opentelemetry-exporter-otlp -->
-		<dependency>
-			<groupId>io.opentelemetry</groupId>
-			<artifactId>opentelemetry-exporter-otlp</artifactId>
-			<version>${opentelemetry-exporter-otlp}</version>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/io.grpc/grpc-netty -->
-		<dependency>
-			<groupId>io.grpc</groupId>
-			<artifactId>grpc-netty-shaded</artifactId>
-			<version>${grpc-netty-shaded}</version>
-		</dependency>
-<!-- OpenTelemetry - Sleuth-->
 	</dependencies>
-
-<!-- OpenTelemetry - Sleuth-->
-	<repositories>
-		<repository>
-			<id>spring-snapshots</id>
-			<url>https://repo.spring.io/snapshot</url>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
-		<repository>
-			<id>spring-milestones</id>
-			<url>https://repo.spring.io/milestone</url>
-		</repository>
-	</repositories>
-	<pluginRepositories>
-		<pluginRepository>
-			<id>spring-snapshots</id>
-			<url>https://repo.spring.io/snapshot</url>
-		</pluginRepository>
-		<pluginRepository>
-			<id>spring-milestones</id>
-			<url>https://repo.spring.io/milestone</url>
-		</pluginRepository>
-	</pluginRepositories>
-<!-- OpenTelemetry - Sleuth-->
 
 	<build>
 		<plugins>

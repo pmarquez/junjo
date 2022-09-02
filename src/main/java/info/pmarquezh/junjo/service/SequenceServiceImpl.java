@@ -80,7 +80,7 @@ public class SequenceServiceImpl implements SequenceService {
     @Override
     public String persistSequence ( SequenceDTO sequenceDTO ) {
 
-        SequenceRec seq = sequenceMapper.toSequence ( sequenceDTO );
+        SequenceRec seq = sequenceMapper.convertDtoToEntity ( sequenceDTO );
 
         SequenceRec newSequence;
 
@@ -148,7 +148,7 @@ public class SequenceServiceImpl implements SequenceService {
     @Override
     public int updateSequence ( String sequenceId, SequenceDTO sequenceDTO ) {
 
-        SequenceRec seq = sequenceMapper.toSequence ( sequenceDTO );
+        SequenceRec seq = sequenceMapper.convertDtoToEntity ( sequenceDTO );
 
         if ( seq.getPattern ( ) == null ) {
             return 400; //   BAD_REQUEST
