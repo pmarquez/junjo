@@ -1,7 +1,7 @@
 FROM eclipse-temurin:17-jre-alpine
 
 # copy JAR into image
-COPY /junjo-0.9.5.jar /junjo.jar
+COPY /junjo-0.9.6.jar /junjo.jar
 
 EXPOSE 8100
 

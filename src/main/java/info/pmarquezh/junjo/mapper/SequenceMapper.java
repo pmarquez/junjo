@@ -7,6 +7,8 @@ import lombok.extern.java.Log;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 //   ns Framework Imports
@@ -44,27 +46,29 @@ import info.pmarquezh.junjo.model.sequence.SequenceDTO;
 @Component
 public class SequenceMapper {
 
-    public SequenceDTO toDto ( SequenceRec sequence ) {
+    private ModelMapper modelMapper;
 
-        return SequenceDTO.builder ( ).sequenceName ( sequence.getSequenceName ( ) )
-                                      .pattern ( sequence.getPattern ( ) )
-                                      .currentNumericSequence ( sequence.getCurrentNumericSequence ( ) )
-                                      .currentAlphaSequence ( sequence.getCurrentAlphaSequence ( ) )
-                                      .priorityType ( sequence.getPriorityType ( ) )
-                                      .currentAlphaRepresentation ( sequence.getCurrentAlphaRepresentation ( ) )
-                                      .build ( );
-
+    @Autowired
+    public SequenceMapper ( ModelMapper modelMapper ) {
+        this.modelMapper = modelMapper;
     }
 
-    public SequenceRec toSequence ( SequenceDTO sequenceDTO ) {
+    /**
+     * Converts a validated DTO to an entity.
+     * @param registrationDto
+     * @return
+     */
+    public SequenceRec convertDtoToEntity ( SequenceDTO registrationDto ) {
+        return modelMapper.map ( registrationDto, SequenceRec.class );
+    }
 
-        return SequenceRec.builder ( ).sequenceName ( sequenceDTO.getSequenceName ( ) )
-                                      .pattern ( sequenceDTO.getPattern ( ) )
-                                      .currentNumericSequence ( sequenceDTO.getCurrentNumericSequence ( ) )
-                                      .currentAlphaSequence ( sequenceDTO.getCurrentAlphaSequence ( ) )
-                                      .priorityType ( sequenceDTO.getPriorityType ( ) )
-                                      .currentAlphaRepresentation ( sequenceDTO.getCurrentAlphaRepresentation ( ) )
-                                      .build ( );
+    /**
+     * Converts an entity to a DTO.
+     * @param sequence
+     * @return
+     */
+    public SequenceDTO convertEntityToDTO ( SequenceRec sequence ) {
+        return modelMapper.map ( sequence, SequenceDTO.class );
     }
 
 }

@@ -120,6 +120,13 @@ docker pull pmarquezh/junjo
 
 ## Release Notes
 
+### v0.9.6
+```
+* Cleaned up pom file.
+* Improved Model Mapper.
+* Fixed API call to generate next 'n' elements.
+```
+
 ### v0.9.5
 ```
 * i18n phase 0ne, complete.

@@ -3,9 +3,10 @@ package info.pmarquezh.junjo.web.controller;
 //   Standard Libraries Imports
 import java.util.ArrayList;
 import java.util.List;
+import javax.validation.Valid;
 
 //   Third Party Libraries Imports
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -14,12 +15,11 @@ import org.springframework.web.bind.annotation.*;
 
 //   FENIX Framework Imports
 
+
 //   Domain Imports
 import info.pmarquezh.junjo.model.sequence.SequenceRec;
 import info.pmarquezh.junjo.service.SequenceService;
 import info.pmarquezh.junjo.model.sequence.SequenceDTO;
-
-import javax.validation.Valid;
 
 /**
  * SequenceRestController.java<br><br>
@@ -47,7 +47,7 @@ import javax.validation.Valid;
  * @author pmarquezh
  * @version 1.0 - 2022-02-08 16:55
  */
-@Log
+@Slf4j
 @RestController
 @RequestMapping( "/junjoAPI/1.0/sequences" )
 public class SequenceRestController {
@@ -161,7 +161,7 @@ public class SequenceRestController {
      * Generate next element in the sequence.
      * @return
      */
-    @GetMapping( { "{sequenceId}/generate" } )
+    @GetMapping( { "/{sequenceId}/generate" } )
     public ResponseEntity<String> generateNextElementInSequence ( @PathVariable ( "sequenceId" ) String sequenceId ) {
 
         String generatedElement = sequenceService.getNextInSequence ( sequenceId );
@@ -180,7 +180,7 @@ public class SequenceRestController {
      * Generate next "n" elements in the sequence.
      * @return
      */
-    @GetMapping( { "{sequenceId}/generate/{quantity}" } )
+    @GetMapping( { "/{sequenceId}/generate/{quantity}" } )
     public ResponseEntity<List<String>> generateNextElementsInSequence ( @PathVariable ( "sequenceId" ) String sequenceId, @PathVariable ( "quantity" ) int quantity  ) {
 
         List<String> generatedElements = sequenceService.getNextElementsInSequence ( sequenceId, quantity );

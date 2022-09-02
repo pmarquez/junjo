@@ -42,7 +42,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class SequenceDTO {
     @NotBlank ( message = "{validation.sequenceName}" )
     String sequenceName;
