@@ -120,6 +120,13 @@ docker pull pmarquezh/junjo
 
 ## Release Notes
 
+### v0.9.7
+```
+* Refactored Controller Advice Exceptions.
+* Refactored SequenceService.
+* Refactored SequenceRestController.
+```
+
 ### v0.9.6
 ```
 * Cleaned up pom file.
