@@ -18,4 +18,10 @@ public class ErrorMessageDto {
         this.field = field;
         this.message = message;
     }
+
+    public ErrorMessageDto ( String object, String message ) {
+        this.object = object;
+        this.message = message;
+    }
+
 }

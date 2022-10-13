@@ -1,9 +1,9 @@
 package info.pmarquezh.junjo.web.controller;
 
 //   Standard Libraries Imports
-import java.util.ArrayList;
 import java.util.List;
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 
 //   Third Party Libraries Imports
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 //   FENIX Framework Imports
@@ -50,6 +51,7 @@ import info.pmarquezh.junjo.model.sequence.SequenceDTO;
 @Slf4j
 @RestController
 @RequestMapping( "/junjoAPI/1.0/sequences" )
+@Validated
 public class SequenceRestController {
 
     private SequenceService sequenceService;
@@ -68,14 +70,9 @@ public class SequenceRestController {
 
         String newSequenceId = sequenceService.persistSequence ( sequenceDTO );
         HttpHeaders headers = new HttpHeaders ( );
+                    headers.add ( "Location", newSequenceId );
 
-        if ( !newSequenceId.equals( "" ) ) {
-            headers.add ( "Location", newSequenceId );
-            return new ResponseEntity<> ( headers, HttpStatus.CREATED );
-        } else {
-            return new ResponseEntity<> ( HttpStatus.BAD_REQUEST );
-        }
-
+        return new ResponseEntity<> ( headers, HttpStatus.CREATED );
     }
 
     /**
@@ -84,16 +81,8 @@ public class SequenceRestController {
      */
     @GetMapping( { "" } )
     public ResponseEntity<List<SequenceRec>> retrieveSequences ( ) {
-
         List<SequenceRec> sequences = sequenceService.retrieveSequences ( );
-
-        if ( !sequences.isEmpty ( ) ) {
-            return new ResponseEntity<> ( sequences, HttpStatus.OK );
-
-        } else {
-            return new ResponseEntity<> ( new ArrayList<> ( ), HttpStatus.NOT_FOUND );
-        }
-
+        return new ResponseEntity<> ( sequences, HttpStatus.OK );
     }
 
     /**
@@ -102,15 +91,8 @@ public class SequenceRestController {
      */
     @GetMapping( { "/{sequenceId}" } )
     public ResponseEntity<SequenceRec> retrieveSequence ( @PathVariable ( "sequenceId" ) String sequenceId ) {
-
         SequenceRec sequence = sequenceService.retrieveSequence ( sequenceId );
-
-        if ( sequence != null  ) {
-            return new ResponseEntity<> ( sequence, HttpStatus.OK );
-        } else {
-            return new ResponseEntity<> ( HttpStatus.NOT_FOUND );
-        }
-
+        return new ResponseEntity<> ( sequence, HttpStatus.OK );
     }
 
     /**
@@ -119,23 +101,8 @@ public class SequenceRestController {
      */
     @PutMapping( { "/{sequenceId}" } )
     public ResponseEntity<Void> updateSequence ( @PathVariable ( "sequenceId" ) String sequenceId, @RequestBody SequenceDTO sequenceDTO ) {
-
-        int updateStatus = sequenceService.updateSequence ( sequenceId, sequenceDTO );
-
-        switch ( updateStatus ) {
-            case 204:
-                return new ResponseEntity<> ( HttpStatus.NO_CONTENT );
-
-            case 400:
-                return new ResponseEntity<> ( HttpStatus.BAD_REQUEST );
-
-            case 404:
-                return new ResponseEntity<> ( HttpStatus.NOT_FOUND );
-
-            default:
-                return new ResponseEntity<> ( HttpStatus.I_AM_A_TEAPOT );
-        }
-
+        sequenceService.updateSequence ( sequenceId, sequenceDTO );
+        return new ResponseEntity<> ( HttpStatus.NO_CONTENT );
     }
 
     /**
@@ -144,17 +111,8 @@ public class SequenceRestController {
      */
     @DeleteMapping( { "/{sequenceId}" } )
     public ResponseEntity<Void> deleteSequence ( @PathVariable ( "sequenceId" ) String sequenceId ) {
-
-        String deletedSequenceId = sequenceService.deleteSequence ( sequenceId );
-
-        if ( deletedSequenceId != null  ) {
-            return new ResponseEntity<> ( HttpStatus.NO_CONTENT );
-
-        } else {
-            return new ResponseEntity<> ( HttpStatus.NOT_FOUND ); //   CORRECT RESPONSE STATUS?
-
-        }
-
+        sequenceService.deleteSequence ( sequenceId );
+        return new ResponseEntity<> ( HttpStatus.NO_CONTENT );
     }
 
     /**
@@ -163,17 +121,8 @@ public class SequenceRestController {
      */
     @GetMapping( { "/{sequenceId}/generate" } )
     public ResponseEntity<String> generateNextElementInSequence ( @PathVariable ( "sequenceId" ) String sequenceId ) {
-
         String generatedElement = sequenceService.getNextInSequence ( sequenceId );
-
-        if ( !generatedElement.isEmpty ( ) ) {
-
-            return new ResponseEntity<> ( generatedElement, HttpStatus.OK );
-
-        } else {
-            return new ResponseEntity<> ( HttpStatus.NOT_FOUND );
-
-        }
+        return new ResponseEntity<> ( generatedElement, HttpStatus.OK );
     }
 
     /**
@@ -181,19 +130,9 @@ public class SequenceRestController {
      * @return
      */
     @GetMapping( { "/{sequenceId}/generate/{quantity}" } )
-    public ResponseEntity<List<String>> generateNextElementsInSequence ( @PathVariable ( "sequenceId" ) String sequenceId, @PathVariable ( "quantity" ) int quantity  ) {
-
+    public ResponseEntity<List<String>> generateNextElementsInSequence ( @PathVariable ( "sequenceId" ) String sequenceId, @PathVariable ( "quantity" ) @Valid @Min ( 1 ) int quantity  ) {
         List<String> generatedElements = sequenceService.getNextElementsInSequence ( sequenceId, quantity );
-
-        if ( !generatedElements.isEmpty ( ) ) {
-
-            return new ResponseEntity<> ( generatedElements, HttpStatus.OK );
-
-        } else {
-            return new ResponseEntity<> ( new ArrayList<> ( ), HttpStatus.NOT_FOUND );
-
-        }
-
+        return new ResponseEntity<> ( generatedElements, HttpStatus.OK );
     }
 
 }

@@ -5,11 +5,10 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 
 //   Third Party Libraries Imports
-import lombok.extern.java.Log;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 //   ns Framework Imports
 
@@ -38,7 +37,7 @@ import lombok.NoArgsConstructor;
  * @author pmarquezh
  * @version 1.0 - 2022-04-06 10:31
  */
-@Log
+@Slf4j
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

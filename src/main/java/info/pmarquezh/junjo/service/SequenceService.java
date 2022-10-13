@@ -60,7 +60,7 @@ public interface SequenceService {
      * @param sequenceId
      * @return SequenceRec The sequence record to update.
      */
-    int updateSequence ( String sequenceId, SequenceDTO sequenceDTO );
+    String updateSequence ( String sequenceId, SequenceDTO sequenceDTO );
 
     /**
      * Deletes a sequence [D]

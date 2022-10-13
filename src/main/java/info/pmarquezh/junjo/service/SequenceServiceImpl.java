@@ -2,15 +2,13 @@ package info.pmarquezh.junjo.service;
 
 //   Standard Libraries Imports
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 //   Third Party Libraries Imports
 import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -46,11 +44,15 @@ import info.pmarquezh.junjo.model.sequence.SequenceDTO;
  * @author pmarquezh
  * @version 1.0 - 2022-02-08 16:58
  */
-@Log
+@Slf4j
 @Service
 public class SequenceServiceImpl implements SequenceService {
 
-    private static final String PRIORITY_NUMERIC = "numeric";
+    private static final String PRIORITY_NUMERIC      = "numeric";
+    private static final int    CHAR_FOR_A            = 65;
+    private static final int    NUM_CHARS_FROM_A_TO_Z = 26;
+    private static final int    NUMBER_ONE            =  1;
+    private static final String BLANK                 =  "";
 
     @Value("${info.pmarquezh.junjo.numericPattern}")
     private String      numericPatternString;
@@ -81,26 +83,11 @@ public class SequenceServiceImpl implements SequenceService {
     public String persistSequence ( SequenceDTO sequenceDTO ) {
 
         SequenceRec seq = sequenceMapper.convertDtoToEntity ( sequenceDTO );
+                    seq.setId ( UUID.randomUUID ( ).toString ( ) );
 
-        SequenceRec newSequence;
+        SequenceRec sr = sequenceRepository.save ( seq );
 
-        if ( seq.getPattern ( ) == null ) {
-            newSequence = SequenceRec.builder ( ).id ( "" ).build ( );
-
-        } else {
-            newSequence = SequenceRec.builder ( ).id ( UUID.randomUUID ( ).toString ( ) )
-                                                 .sequenceName ( seq.getSequenceName ( ) )
-                                                 .pattern( seq.getPattern ( ) )
-                                                 .currentNumericSequence ( seq.getCurrentNumericSequence ( ) )
-                                                 .currentAlphaSequence ( seq.getCurrentAlphaSequence ( ) )
-                                                 .priorityType ( seq.getPriorityType ( ) )
-                                                 .build ( );
-
-            sequenceRepository.save ( newSequence );
-
-        }
-
-        return newSequence.getId ( );
+        return sr.getId ( );
 
     }
 
@@ -112,11 +99,10 @@ public class SequenceServiceImpl implements SequenceService {
     @Override
     public List<SequenceRec> retrieveSequences ( ) {
 
-        Iterable<SequenceRec> iSequences = sequenceRepository.findAll ( );
-
         List<SequenceRec> sequences = new ArrayList<> ( );
 
-        iSequences.forEach ( sequences::add );
+        Iterable<SequenceRec> iSequences = sequenceRepository.findAll ( );
+                              iSequences.forEach ( sequences::add );
 
         return sequences;
 
@@ -128,13 +114,11 @@ public class SequenceServiceImpl implements SequenceService {
      * @return
      */
     @Override
-    public SequenceRec retrieveSequence ( String sequenceId ) {
-
-        if ( !validateUUID ( sequenceId ) ) { return null; }
+    public SequenceRec retrieveSequence ( String sequenceId ) throws NoSuchElementException {
 
         Optional<SequenceRec> sequenceWrapper = sequenceRepository.findById ( sequenceId );
 
-        return ( sequenceWrapper.isPresent ( ) ) ? sequenceWrapper.get ( ) : null;
+        return sequenceWrapper.get ( );
 
     }
 
@@ -146,30 +130,17 @@ public class SequenceServiceImpl implements SequenceService {
      * @return SequenceRec The sequence record to update.
      */
     @Override
-    public int updateSequence ( String sequenceId, SequenceDTO sequenceDTO ) {
+    public String updateSequence ( String sequenceId, SequenceDTO sequenceDTO ) throws NoSuchElementException {
+
+        SequenceRec dbSequence = this.retrieveSequence ( sequenceId );
 
         SequenceRec seq = sequenceMapper.convertDtoToEntity ( sequenceDTO );
+                    seq.setId (dbSequence.getId ( ) );
 
-        if ( seq.getPattern ( ) == null ) {
-            return 400; //   BAD_REQUEST
-        } else {
-            SequenceRec dbSequence = this.retrieveSequence ( sequenceId );
+        sequenceRepository.save ( seq );
 
-            if ( dbSequence != null ) {
-                dbSequence.setSequenceName ( seq.getSequenceName ( ) );
-                dbSequence.setPattern( seq.getPattern( ) );
-                dbSequence.setCurrentAlphaSequence ( seq.getCurrentAlphaSequence ( ) );
-                dbSequence.setCurrentNumericSequence ( seq.getCurrentNumericSequence ( ) );
-                dbSequence.setPriorityType ( seq.getPriorityType ( ) );
+        return sequenceId;
 
-                sequenceRepository.save ( dbSequence );
-
-                return 204;   //   NO_CONTENT
-
-            } else {
-                return 404;   //   NOT_FOUND
-            }
-        }
     }
 
     /**
@@ -179,20 +150,10 @@ public class SequenceServiceImpl implements SequenceService {
      * @return SequenceRec The sequence record to delete or null if not found (null is only informative).
      */
     @Override
-    public String deleteSequence ( String sequenceId ) {
-
+    public String deleteSequence ( String sequenceId ) throws NoSuchElementException {
         SequenceRec dbSequence = this.retrieveSequence ( sequenceId);
-
-        if ( dbSequence != null ) {
-            sequenceRepository.delete ( dbSequence );
-
-            return dbSequence.getId ( );
-
-        } else {
-            return null;
-
-        }
-
+        sequenceRepository.delete ( dbSequence );
+        return sequenceId;
     }
 
     /*********************************************************************/
@@ -213,10 +174,9 @@ public class SequenceServiceImpl implements SequenceService {
      * @return String The generated element from a sequence or null (if sequenceId is not valid/found).
      */
     @Override
-    public String getNextInSequence ( String sequenceId ) {
+    public String getNextInSequence ( String sequenceId ) throws NoSuchElementException {
 
         sequence = this.retrieveSequence ( sequenceId );
-        if ( sequence == null ) {  return ""; }
 
         template = sequence.getPattern( );
 
@@ -246,10 +206,9 @@ public class SequenceServiceImpl implements SequenceService {
      * @return List<String> The list of generated elements from a sequence or null (if sequenceId is not valid/found).
      */
     @Override
-    public List<String> getNextElementsInSequence ( String sequenceId, int quantity ) {
+    public List<String> getNextElementsInSequence ( String sequenceId, int quantity ) throws NoSuchElementException {
 
         sequence = this.retrieveSequence ( sequenceId );
-        if ( sequence == null ) {  return new ArrayList<> ( ); }
 
         List<String> elements = new ArrayList<> ( );
 
@@ -425,11 +384,6 @@ public class SequenceServiceImpl implements SequenceService {
         String numAsString = Integer.toString ( num );
         return numAsString.length ( );
     }
-
-    private static final int    CHAR_FOR_A            = 65;
-    private static final int    NUM_CHARS_FROM_A_TO_Z = 26;
-    private static final int    NUMBER_ONE            =  1;
-    private static final String BLANK                 =  "";
 
     /**
      *
